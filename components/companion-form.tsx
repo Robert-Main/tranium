@@ -5,14 +5,20 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-
-import { companionFormSchema } from "@/lib/companion-form";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select";
-import { subjects, voices } from "@/constants";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { companionFormSchema, CompanionFormType } from "@/lib/companion-form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { subjects } from "@/constants";
 import { Textarea } from "./ui/textarea";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { createCompanion } from "@/lib/actions/companion.action";
+import { useState } from "react";
 
 export function CompanionForm() {
+    const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
+
     const form = useForm<z.infer<typeof companionFormSchema>>({
         resolver: zodResolver(companionFormSchema),
         defaultValues: {
@@ -25,11 +31,27 @@ export function CompanionForm() {
         },
     });
 
-    async function onSubmit(data: z.infer<typeof companionFormSchema>) {
+    async function onSubmit(data: CompanionFormType) {
         console.log(data);
-    }
+        setIsLoading(true);
 
-    console.log(form.formState.errors);
+        try {
+            const res = await createCompanion(data);
+            if (res && res.success && res.data?.id) {
+                toast.success("Companion created successfully!");
+                router.push(`/companions/${res.data.id}`);
+            } else {
+                const msg = res && !res.success ? res.error || "Failed to create companion" : "Failed to create companion";
+                toast.error(msg);
+                console.error("Failed to create companion:", res);
+            }
+        } catch (error) {
+            console.error("Error submitting form:", error);
+            toast.error("An unexpected error occurred");
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
     return (
         <Form {...form}>
@@ -145,7 +167,13 @@ export function CompanionForm() {
                         </FormItem>
                     )}
                 />
-                <Button type="submit" className="w-full cursor-pointer">Create companion</Button>
+                <Button
+                    type="submit"
+                    disabled={isLoading || form.formState.isSubmitting}
+                    className="w-full cursor-pointer"
+                >
+                    {(isLoading || form.formState.isSubmitting) ? "Creating..." : "Create Companion"}
+                </Button>
             </form>
         </Form>
     );
