@@ -7,12 +7,12 @@ import Link from "next/link";
 interface CompanionCardProps {
     id?: string;
     name?: string;
-    topics?: string;
+    topic?: string;
     subject?: string;
     duration?: number;
     color?: string;
 }
-const CompanionCard = ({ id, name, topics, subject, duration, color}:CompanionCardProps) => {
+const CompanionCard = ({ id, name, topic, subject, duration, color}:CompanionCardProps) => {
   return (
       <article
           className="companion-card"
@@ -27,7 +27,7 @@ const CompanionCard = ({ id, name, topics, subject, duration, color}:CompanionCa
               </Button>
           </div>
           <h2 className="text-2xl font-bold">{name}</h2>
-          <p className="text-sm">{topics}</p>
+          <p className="text-sm">{topic}</p>
           <div className="flex items-center gap-2">
               <Image src="/icons/clock.svg" alt="clock" width={13.5} height={13.5} />
                 <span className="text-sm">{duration} mins</span>

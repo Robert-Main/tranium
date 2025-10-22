@@ -27,12 +27,11 @@ export function CompanionForm() {
             topic: "",
             voice: "",
             style: "",
-            duration: 15
+            duration: 15,
         },
     });
 
     async function onSubmit(data: CompanionFormType) {
-        console.log(data);
         setIsLoading(true);
 
         try {
@@ -41,7 +40,8 @@ export function CompanionForm() {
                 toast.success("Companion created successfully!");
                 router.push(`/companions/${res.data.id}`);
             } else {
-                const msg = res && !res.success ? res.error || "Failed to create companion" : "Failed to create companion";
+                const msg =
+                    res && !res.success ? res.error || "Failed to create companion" : "Failed to create companion";
                 toast.error(msg);
                 console.error("Failed to create companion:", res);
             }
@@ -172,7 +172,7 @@ export function CompanionForm() {
                     disabled={isLoading || form.formState.isSubmitting}
                     className="w-full cursor-pointer"
                 >
-                    {(isLoading || form.formState.isSubmitting) ? "Creating..." : "Create Companion"}
+                    {isLoading || form.formState.isSubmitting ? "Creating..." : "Create Companion"}
                 </Button>
             </form>
         </Form>

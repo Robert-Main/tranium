@@ -12,7 +12,7 @@ const Page = () => {
                 <CompanionCard
                     id="12"
                     name="John Doe"
-                    topics="An adventurous companion who loves hiking and outdoor activities."
+                    topic="An adventurous companion who loves hiking and outdoor activities."
                     subject="Hiking"
                     duration={14}
                     color="blue"
@@ -20,7 +20,7 @@ const Page = () => {
                 <CompanionCard
                     id="5"
                     name="Countcy the numder wizard"
-                    topics="Directives and integral."
+                    topic="Directives and integral."
                     subject="math"
                     duration={45}
                     color="red"
@@ -28,7 +28,7 @@ const Page = () => {
                 <CompanionCard
                     id="9"
                     name="Verbal and vocabulary Builder."
-                    topics="Language skills improvement."
+                    topic="Language skills improvement."
                     subject="English"
                     duration={30}
                     color="green"
