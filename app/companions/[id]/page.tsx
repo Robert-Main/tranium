@@ -1,3 +1,4 @@
+import CompanionComponents from "@/components/companion-components";
 import { getCompanionById } from "@/lib/actions/companion.action";
 import { getSubjectColor } from "@/lib/utils";
 import { currentUser } from "@clerk/nextjs/server";
@@ -43,7 +44,8 @@ const CompanionSession = async ({ params }: ComapnionSessionProps) => {
                     </div>
                 </div>
                 <div className="items-start text-xl max-md:hidden">{duration} mins</div>
-            </article>
+        </article>
+        <CompanionComponents {...companionRes.data} companionId = {id} userName = {user.firstName!} userImage = {user.imageUrl!}  />
         </main>
     );
 };
