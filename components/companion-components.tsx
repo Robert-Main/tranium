@@ -8,6 +8,8 @@ import Image from "next/image";
 import Lottie, { LottieRefCurrentProps } from "lottie-react";
 import soundwaves from "@/constants/soundwaves.json";
 import { Button } from "./ui/button";
+import { addSessionHistory } from "@/lib/actions/companion.action";
+import { toast } from "sonner";
 
 interface CompanionComponentsProps {
     companionId: string;
@@ -54,7 +56,25 @@ const CompanionComponents = ({
 
     useEffect(() => {
         const onCallStatus = () => setCallStatus(CallStatus.ACTIVE);
-        const onCallEnd = () => setCallStatus(CallStatus.FINISHED);
+        const onCallEnd = async() => {
+            setCallStatus(CallStatus.FINISHED);
+            setIsMuted(false);
+            try {
+                  const result = await addSessionHistory(companionId);
+
+                  if (result.success) {
+                      console.log("Session history saved successfully:", result.data);
+                      toast.success("Session saved successfully!");
+                  } else {
+                      console.error("Failed to save session history:", result.error);
+                      toast.error("Failed to save session history");
+                }
+
+                return;
+            } catch (error) {
+                console.error("Error ending session:", error);
+            }
+        };
 
         const onSpeechStart = () => setIsSpeaking(true);
         const onSpeechEnd = () => setIsSpeaking(false);
@@ -84,7 +104,7 @@ const CompanionComponents = ({
             vapi.off("speech-start", onSpeechStart);
             vapi.off("speech-end", onSpeechEnd);
         };
-    }, [callStatus]);
+    }, [callStatus, companionId]);
 
     const handleToggleMic = async () => {
         const isMuted = vapi.isMuted();

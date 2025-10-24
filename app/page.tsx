@@ -3,36 +3,30 @@ import CompanionCard from "@/components/companion-card";
 import CompanionsList from "@/components/companions-list";
 import CTA from "@/components/CTA";
 import { recentSessions } from "@/constants";
+import { getAllCompanions, getSessionHistories } from "@/lib/actions/companion.action";
+import { getSubjectColor } from "@/lib/utils";
 
-const Page = () => {
+const Page = async() => {
+
+    const companionsData = await getAllCompanions({ limit: 5, page: 1 });
+    const companions = companionsData;
+    const recentSessionsData = await getSessionHistories(10);
+
+    // Transform the data to extract companions from nested structure
+    const recentSessions = recentSessionsData.map((item: any) => item.companions);
     return (
         <main>
             <h1 className="text-2xl ">Popular Companions</h1>
             <section className="home-section">
-                <CompanionCard
-                    id="12"
-                    name="John Doe"
-                    topic="An adventurous companion who loves hiking and outdoor activities."
-                    subject="Hiking"
-                    duration={14}
-                    color="blue"
-                />
-                <CompanionCard
-                    id="5"
-                    name="Countcy the numder wizard"
-                    topic="Directives and integral."
-                    subject="math"
-                    duration={45}
-                    color="red"
-                />
-                <CompanionCard
-                    id="9"
-                    name="Verbal and vocabulary Builder."
-                    topic="Language skills improvement."
-                    subject="English"
-                    duration={30}
-                    color="green"
-                />
+                {
+                    companions.data?.map((companion: Companion) => (
+                        <CompanionCard
+                            {...companion}
+                            key={companion.id}
+                            color={getSubjectColor(companion.subject)}
+                        />
+                    ))
+                }
             </section>
 
             <section className="home-section">
