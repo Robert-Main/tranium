@@ -45,7 +45,7 @@ const SubjectFilters = () => {
       <button
         type="button"
         onClick={() => setSubject("")}
-        className={`px-3 py-1 rounded-full border text-sm whitespace-nowrap flex flex-wrap ${
+        className={`px-3 py-1 rounded-full border cursor-pointer text-sm whitespace-nowrap flex flex-wrap ${
           currentSubject === "" ? "bg-black text-white" : "bg-white"
         }`}
       >
@@ -59,7 +59,7 @@ const SubjectFilters = () => {
             key={s}
             type="button"
             onClick={() => setSubject(s)}
-            className={`px-3 py-1 rounded-full border text-sm capitalize whitespace-nowrap transition-colors ${
+            className={`px-3 py-1 rounded-full border text-sm capitalize cursor-pointer whitespace-nowrap transition-colors ${
               active ? "text-black" : "text-gray-800"
             }`}
             style={{
