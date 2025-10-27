@@ -56,18 +56,18 @@ const CompanionComponents = ({
 
     useEffect(() => {
         const onCallStatus = () => setCallStatus(CallStatus.ACTIVE);
-        const onCallEnd = async() => {
+        const onCallEnd = async () => {
             setCallStatus(CallStatus.FINISHED);
             setIsMuted(false);
             try {
-                  const result = await addSessionHistory(companionId);
+                const result = await addSessionHistory(companionId);
 
-                  if (result.success) {
-                      console.log("Session history saved successfully:", result.data);
-                      toast.success("Session saved successfully!");
-                  } else {
-                      console.error("Failed to save session history:", result.error);
-                      toast.error("Failed to save session history");
+                if (result.success) {
+                    console.log("Session history saved successfully:", result.data);
+                    toast.success("Session saved successfully!");
+                } else {
+                    console.error("Failed to save session history:", result.error);
+                    toast.error("Failed to save session history");
                 }
 
                 return;
