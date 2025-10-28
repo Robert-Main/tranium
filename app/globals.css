@@ -143,7 +143,7 @@ body {
 
 @layer components {
   .home-section {
-    @apply flex gap-4 justify-between items-start w-full max-lg:flex-col-reverse max-lg:items-center;
+    @apply flex gap-3 justify-between items-start w-full max-lg:flex-col-reverse max-lg:items-center;
   }
 
   .companions-grid {
@@ -183,7 +183,7 @@ body {
   }
 
   .navbar {
-    @apply flex items-center justify-between mx-auto w-full px-14 py-4 bg-white max-sm:px-4;
+    @apply flex items-center justify-between mx-auto w-full px-14 py-3 bg-white max-sm:px-4;
   }
 
   .btn-signin {

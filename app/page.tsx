@@ -11,11 +11,10 @@ const Page = async() => {
     const companions = companionsData;
     const recentSessionsData = await getSessionHistories(10);
 
-    // Transform the data to extract companions from nested structure
     const recentSessions = recentSessionsData.map((item: any) => item.companions);
     return (
         <main>
-            <h1 className="text-2xl ">Popular Companions</h1>
+            <h1 className="text-xl ">Popular Companions</h1>
             <section className="home-section">
                 {
                     companions?.data?.map((companion: Companion) => (

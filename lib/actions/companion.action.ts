@@ -75,7 +75,6 @@ export const getAllCompanions = async ({ limit = 10, page = 1, subject, topic }:
         };
     }
 
-    // If user is authenticated, check for bookmarks
     if (userId && companions && companions.length > 0) {
         const companionIds = companions.map(({ id }) => id);
 
@@ -118,6 +117,52 @@ export async function getCompanionById(id: string) {
         data,
     };
 }
+
+export async function updateCompanion(id: string, updates: Partial<CreateCompanion>) {
+    const { userId } = await auth();
+    const supabase = createSupabaseAdminClient();
+    if (!userId) {
+        return {
+            success: false,
+            error: "Unauthorized - Please sign in",
+        };
+    }
+    const { data, error } = await supabase.from("companions").update(updates).eq("id", id).single();
+    if (error) {
+        return {
+            success: false,
+            error: error.message || "Failed to update companion",
+        };
+    }
+    return {
+        success: true,
+        data,
+    };
+}
+
+export async function deleteCompanion(id: string) {
+    const { userId } = await auth();
+    const supabase = createSupabaseAdminClient();
+    if (!userId) {
+        return {
+            success: false,
+            error: "Unauthorized - Please sign in",
+        };
+    }
+    const { data, error } = await supabase.from("companions").delete().eq("id", id).single();
+    if (error) {
+        return {
+            success: false,
+            error: error.message || "Failed to delete companion",
+        };
+    }
+    return {
+        success: true,
+        data,
+    }
+}
+
+//add delete session history and delete companion
 
 export const addSessionHistory = async (companionId: string) => {
     const { userId } = await auth();
@@ -180,6 +225,28 @@ export const getUserCompanions = async (userId: string) => {
 
     return data;
 };
+
+export const deleteSessionHistory = async (sessionId: string) => {
+    const { userId } = await auth();
+    const supabase = createSupabaseAdminClient();
+    if (!userId) {
+        return {
+            success: false,
+            error: "Unauthorized - Please sign in",
+        };
+    }
+    const { data, error } = await supabase.from("session_history").delete().eq("id", sessionId).single();
+    if (error) {
+        return {
+            success: false,
+            error: error.message || "Failed to delete session history",
+        };
+    }
+    return {
+        success: true,
+        data,
+    };
+}
 
 export const newCompanionPermission = async () => {
     const { userId, has } = await auth();

@@ -4,9 +4,10 @@ import React, { useState } from "react";
 import { Button } from "./ui/button";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { addUserBookmarks, removeUserBookmarks } from "@/lib/actions/companion.action";
+import { usePathname, useRouter } from "next/navigation";
+import { addUserBookmarks, deleteCompanion, removeUserBookmarks } from "@/lib/actions/companion.action";
 import { toast } from "sonner";
+import { Trash2, TrashIcon } from "lucide-react";
 
 interface CompanionCardProps {
     id: string;
@@ -28,7 +29,9 @@ const CompanionCard = ({
     bookmarked: initialBookmarked,
 }: CompanionCardProps) => {
     const pathname = usePathname();
+    const router = useRouter();
     const [bookmarked, setBookmarked] = useState(initialBookmarked);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const handleBookmark = async () => {
 
@@ -56,18 +59,35 @@ const CompanionCard = ({
 
     };
 
+    const handleDelete = async (id: string) => {
+        setIsDeleting(true);
+        const res = await deleteCompanion(id);
+        if (res.success) {
+            toast.success("Companion deleted successfully!");
+            router.refresh();
+        } else {
+            toast.error("Failed to delete companion", { description: res.error });
+        }
+        setIsDeleting(false);
+    }
+
     return (
         <article className="companion-card" style={{ backgroundColor: color }}>
             <div className="flex justify-between items-center">
                 <div className="subject-badge">{subject}</div>
-                <button className="companion-bookmark" onClick={handleBookmark}>
-                    <Image
-                        src={bookmarked ? "/icons/bookmark-filled.svg" : "/icons/bookmark.svg"}
-                        alt="bookmark"
-                        width={12.5}
-                        height={15}
-                    />
-                </button>
+                <div className="flex gap-2 items-center">
+                    <button className="companion-bookmark" onClick={handleBookmark}>
+                        <Image
+                            src={bookmarked ? "/icons/bookmark-filled.svg" : "/icons/bookmark.svg"}
+                            alt="bookmark"
+                            width={12.5}
+                            height={15}
+                        />
+                    </button>
+                    <button className="companion-bookmark" onClick={() => handleDelete(id)}>
+                        <Trash2 className = "text-primary size-4" />
+                    </button>
+                </div>
             </div>
 
             <h2 className="text-2xl font-bold">{name}</h2>
@@ -80,6 +100,10 @@ const CompanionCard = ({
             <Link href={`/companions/${id}`} className="w-full">
                 <button className="btn-primary w-full justify-center">Launch Lesson</button>
             </Link>
+
+            {/* {pathname.includes("/profile") && ( */}
+
+            {/* )} */}
         </article>
     );
 };
