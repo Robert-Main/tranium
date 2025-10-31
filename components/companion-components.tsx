@@ -10,6 +10,7 @@ import soundwaves from "@/constants/soundwaves.json";
 import { Button } from "./ui/button";
 import { addSessionHistory } from "@/lib/actions/companion.action";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface CompanionComponentsProps {
     companionId: string;
@@ -44,6 +45,7 @@ const CompanionComponents = ({
     const [isMuted, setIsMuted] = useState(false);
     const [messages, setMessages] = useState<SavedMessage[]>([]);
 
+    const router = useRouter();
     const LottieRef = React.useRef<LottieRefCurrentProps>(null);
 
     useEffect(() => {
@@ -134,6 +136,7 @@ const CompanionComponents = ({
         setCallStatus(CallStatus.FINISHED);
         try {
             vapi.stop();
+            router.push("/companions");
         } catch (error) {
             console.error("Error disconnecting from companion:", error);
         }

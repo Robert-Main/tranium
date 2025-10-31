@@ -7,7 +7,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { addUserBookmarks, deleteCompanion, removeUserBookmarks } from "@/lib/actions/companion.action";
 import { toast } from "sonner";
-import { Trash2, TrashIcon } from "lucide-react";
+import { Edit, Trash2, TrashIcon } from "lucide-react";
 
 interface CompanionCardProps {
     id: string;
@@ -34,7 +34,6 @@ const CompanionCard = ({
     const [isDeleting, setIsDeleting] = useState(false);
 
     const handleBookmark = async () => {
-
         if (bookmarked) {
             const res = await removeUserBookmarks(id, pathname);
             if (res.success) {
@@ -56,7 +55,6 @@ const CompanionCard = ({
                 toast.error("Failed to save bookmark");
             }
         }
-
     };
 
     const handleDelete = async (id: string) => {
@@ -69,7 +67,7 @@ const CompanionCard = ({
             toast.error("Failed to delete companion", { description: res.error });
         }
         setIsDeleting(false);
-    }
+    };
 
     return (
         <article className="companion-card" style={{ backgroundColor: color }}>
@@ -81,17 +79,22 @@ const CompanionCard = ({
                             src={bookmarked ? "/icons/bookmark-filled.svg" : "/icons/bookmark.svg"}
                             alt="bookmark"
                             width={12.5}
-                            height={15}
+                            height={12.5}
                         />
                     </button>
+                    <Link href={`/companions/${id}/edit`}>
+                        <button className="companion-bookmark">
+                            <Edit className="text-green-400 size-3.5" />
+                        </button>
+                    </Link>
                     <button className="companion-bookmark" onClick={() => handleDelete(id)}>
-                        <Trash2 className = "text-primary size-4" />
+                        <Trash2 className="text-primary size-3.5" />
                     </button>
                 </div>
             </div>
 
             <h2 className="text-2xl font-bold">{name}</h2>
-            <p className="text-sm">{topic}</p>
+            <p className="text-sm truncate">{topic}</p>
             <div className="flex items-center gap-2">
                 <Image src="/icons/clock.svg" alt="duration" width={13.5} height={13.5} />
                 <p className="text-sm">{duration} minutes</p>
@@ -100,10 +103,6 @@ const CompanionCard = ({
             <Link href={`/companions/${id}`} className="w-full">
                 <button className="btn-primary w-full justify-center">Launch Lesson</button>
             </Link>
-
-            {/* {pathname.includes("/profile") && ( */}
-
-            {/* )} */}
         </article>
     );
 };

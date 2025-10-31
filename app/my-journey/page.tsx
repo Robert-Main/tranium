@@ -42,13 +42,6 @@ const Profile = async () => {
                         </div>
                         <div className="">Companion Created</div>
                     </div>
-                    <div className="border border-black rounded-lg p-3 gap-2 flex flex-col h-fit">
-                        <div className="flex gap-2 items-center">
-                            <Image src="/icons/bookmark.svg" alt="bookmark" width={22} height={22} className="text-primary"/>
-                            <p className="font-medium text-2xl">{bookmarkedCompanions?.length}</p>
-                        </div>
-                        <div className="">Bookmarked Companions</div>
-                    </div>
                 </div>
             </section>
             <Accordion type="multiple" className="w-full" defaultValue={["item-1"]}>
@@ -71,7 +64,7 @@ const Profile = async () => {
                 <AccordionItem value="recent">
                     <AccordionTrigger className="text-xl font-semibold">Recent Sessions</AccordionTrigger>
                     <AccordionContent className="flex flex-col gap-4 text-balance">
-                        {<CompanionsList title="Recent Sessions" companions={sessionHistory} className="w-full" />}
+                        {<CompanionsList title="Recent Sessions" companions={sessionHistory} isSessionHistory={true} className="w-full" />}
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>

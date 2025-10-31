@@ -17,7 +17,7 @@ const CompanionsLibrary = async ({ searchParams }: SearchParams) => {
     const companions = result?.success ? result.data : [];
 
     return (
-        <main>
+        <main className="">
             <section className="flex items-center justify-between flex-row gap-4 max-sm:flex-col ">
                 <h1 className="flex-1">Companion Library</h1>
                 <div className="flex gap-4 flex-row max-sm:flex-col w-full flex-1/3">

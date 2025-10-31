@@ -9,8 +9,6 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Airplay, Ellipsis, Trash } from "lucide-react";
@@ -22,19 +20,27 @@ interface CompanionsListProps {
     title?: string;
     companions?: Companion[];
     className?: string;
+    isSessionHistory?: boolean
 }
 
-const CompanionsList = ({ title, companions, className }: CompanionsListProps) => {
+const CompanionsList = ({ title, companions, className, isSessionHistory = false }: CompanionsListProps) => {
     const router = useRouter();
     const [isDeleting, setIsDeleting] = React.useState(false);
-    const handleDelete = async (id: string) => {
+    const handleDelete = async (sessionId: string) => {
+        console.log("Attempting to delete session with ID:", sessionId);
+
+        if (!sessionId) {
+            toast.error("Session ID is missing");
+            return;
+        }
+
         setIsDeleting(true);
-        const res = await deleteSessionHistory(id);
+        const res = await deleteSessionHistory(sessionId);
         if (res.success) {
-            toast.success("Companion deleted successfully!");
+            toast.success("Session deleted successfully!");
             router.refresh();
-        }else{
-            toast.error("Failed to delete companion", { description: res.error });
+        } else {
+            toast.error("Failed to delete session", { description: res.error });
         }
         setIsDeleting(false);
     }
@@ -71,7 +77,7 @@ const CompanionsList = ({ title, companions, className }: CompanionsListProps) =
                                         </div>
                                         <div className="flex flex-col gap-2">
                                             <p className="font-bold text-xl">{companion.name}</p>
-                                            <p className="text-medium">{companion.topic}</p>
+                                            <p className="text-medium line-clamp-2 w-full max-w-[400px]">{companion.topic}</p>
                                         </div>
                                     </div>
                                 </Link>
@@ -106,16 +112,12 @@ const CompanionsList = ({ title, companions, className }: CompanionsListProps) =
                                 </div>
                             </TableCell>
                             <TableCell className="text-right">
-                                <DropdownMenu>
+                                 <DropdownMenu>
                                     <DropdownMenuTrigger>
                                         <Ellipsis className="cursor-pointer"/>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent>
-                                        <DropdownMenuItem disabled={isDeleting} onClick={() => handleDelete(companion.id)}>
-                                            <Trash className="text-red-400 "  />
-                                            Delete session
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem className="text-primary">
+                                        <DropdownMenuItem className="text-green-500">
                                             <Airplay />
                                             <Link
                                                 href={`/companions/${companion.id}`}
@@ -124,6 +126,16 @@ const CompanionsList = ({ title, companions, className }: CompanionsListProps) =
                                                 Start Lesson
                                             </Link>
                                         </DropdownMenuItem>
+                                        {isSessionHistory &&  (
+                                            <DropdownMenuItem
+                                                disabled={isDeleting}
+                                                onClick={() => handleDelete(companion.sessionId)}
+                                                className="text-red-500 hover:text-red-700"
+                                            >
+                                                <Trash className="text-red-400" />
+                                                Delete session
+                                            </DropdownMenuItem>
+                                        )}
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </TableCell>
