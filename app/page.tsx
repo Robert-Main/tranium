@@ -5,34 +5,29 @@ import CTA from "@/components/CTA";
 import { getAllCompanions, getSessionHistories } from "@/lib/actions/companion.action";
 import { getSubjectColor } from "@/lib/utils";
 
-const Page = async() => {
-
+const Page = async () => {
     const companionsData = await getAllCompanions({ limit: 5, page: 1 });
     const companions = companionsData;
     const recentSessionsData = await getSessionHistories(10);
 
     const recentSessions = recentSessionsData.map((item: any) => item.companions);
+
     return (
-        <main>
+        <main className="bg-[#4af8f8] w-full">
             <h1 className="text-xl ">Popular Companions</h1>
             <section className="home-section">
-                {
-                    companions?.data?.map((companion: Companion) => (
-                        <CompanionCard
-                            {...companion}
-                            key={companion.id}
-                            color={getSubjectColor(companion.subject)}
-                        />
-                    ))
-                }
+                {companions?.data?.map((companion: Companion) => (
+                    <CompanionCard {...companion} key={companion.id} color={getSubjectColor(companion.subject)} />
+                ))}
             </section>
 
             <section className="home-section">
-          <CompanionsList
-            title="Recent Companions"
-            companions={recentSessions}
-            className="w-2/3 max-lg:w-full"
-          />
+                <CompanionsList
+                    title="Recent Companions"
+                    companions={recentSessions}
+                    isSessionHistory={true}
+                    className="w-2/3 max-lg:w-full"
+                />
                 <CTA />
             </section>
         </main>

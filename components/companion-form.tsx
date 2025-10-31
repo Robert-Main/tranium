@@ -12,38 +12,79 @@ import { subjects } from "@/constants";
 import { Textarea } from "./ui/textarea";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { createCompanion } from "@/lib/actions/companion.action";
-import { useState } from "react";
+import { createCompanion, updateCompanion } from "@/lib/actions/companion.action";
+import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 
-export function CompanionForm() {
+interface CompanionFormProps {
+    companion?: Companion;
+}
+
+export function CompanionForm({ companion }: CompanionFormProps) {
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+    const isEditMode = !!companion;
 
     const form = useForm<z.infer<typeof companionFormSchema>>({
         resolver: zodResolver(companionFormSchema),
-        defaultValues: {
-            name: "",
-            subject: "",
-            topic: "",
-            voice: "",
-            style: "",
-            duration: 15,
-        },
+        defaultValues: companion
+            ? {
+                  name: companion.name || "",
+                  subject: companion.subject || "",
+                  topic: companion.topic || "",
+                  voice: companion.voice || "",
+                  style: companion.style || "",
+                  duration: companion.duration || 15,
+              }
+            : {
+                  name: "",
+                  subject: "",
+                  topic: "",
+                  voice: "",
+                  style: "",
+                  duration: 15,
+              },
     });
+
+    useEffect(() => {
+        if (companion) {
+            const resetValues = {
+                name: companion.name || "",
+                subject: companion.subject || "",
+                topic: companion.topic || "",
+                voice: companion.voice || "",
+                style: companion.style || "",
+                duration: companion.duration || 15,
+            };
+            form.reset(resetValues);
+        }
+    }, [companion?.id]);
 
     async function onSubmit(data: CompanionFormType) {
         setIsLoading(true);
 
         try {
-            const res = await createCompanion(data);
-            if (res && res.success && res.data?.id) {
-                toast.success("Companion created successfully!");
-                router.push(`/companions/${res.data.id}`);
+            let res;
+            if (isEditMode && companion?.id) {
+                res = await updateCompanion(companion.id, data);
+            } else {
+                res = await createCompanion(data);
+            }
+
+            if (res && res.success) {
+                toast.success(isEditMode ? "Companion updated successfully!" : "Companion created successfully!");
+
+                if (res.data?.id) {
+                    router.push(`/companions/${res.data.id}`);
+                } else {
+                    router.push(`/companions/`);
+                }
             } else {
                 const msg =
-                    res && !res.success ? res.error || "Failed to create companion" : "Failed to create companion";
+                    res && !res.success
+                        ? res.error || `Failed to ${isEditMode ? "update" : "create"} companion`
+                        : `Failed to ${isEditMode ? "update" : "create"} companion`;
                 toast.error(msg);
-                console.error("Failed to create companion:", res);
             }
         } catch (error) {
             console.error("Error submitting form:", error);
@@ -76,7 +117,7 @@ export function CompanionForm() {
                         <FormItem>
                             <FormLabel>Subject</FormLabel>
                             <FormControl>
-                                <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                                <Select onValueChange={field.onChange} value={field.value}>
                                     <SelectTrigger className="input capitalize">
                                         <SelectValue placeholder="select the subject" />
                                     </SelectTrigger>
@@ -113,7 +154,7 @@ export function CompanionForm() {
                         <FormItem>
                             <FormLabel>Voices</FormLabel>
                             <FormControl>
-                                <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                                <Select onValueChange={field.onChange} value={field.value}>
                                     <SelectTrigger className="input capitalize">
                                         <SelectValue placeholder="select the voice" />
                                     </SelectTrigger>
@@ -134,7 +175,7 @@ export function CompanionForm() {
                         <FormItem>
                             <FormLabel>Voice style</FormLabel>
                             <FormControl>
-                                <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                                <Select onValueChange={field.onChange} value={field.value}>
                                     <SelectTrigger className="input capitalize">
                                         <SelectValue placeholder="select the voice style" />
                                     </SelectTrigger>
@@ -172,7 +213,16 @@ export function CompanionForm() {
                     disabled={isLoading || form.formState.isSubmitting}
                     className="w-full cursor-pointer"
                 >
-                    {isLoading || form.formState.isSubmitting ? "Creating..." : "Create Companion"}
+                    {isLoading || form.formState.isSubmitting ? (
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            {isEditMode ? "Updating..." : "Creating..."}
+                        </>
+                    ) : isEditMode ? (
+                        "Update Companion"
+                    ) : (
+                        "Create Companion"
+                    )}
                 </Button>
             </form>
         </Form>
