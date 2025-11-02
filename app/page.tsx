@@ -13,7 +13,7 @@ const Page = async () => {
     const recentSessions = recentSessionsData.map((item: any) => item.companions);
 
     return (
-        <main className="bg-[#4af8f8] w-full">
+        <main >
             <h1 className="text-xl ">Popular Companions</h1>
             <section className="home-section">
                 {companions?.data?.map((companion: Companion) => (

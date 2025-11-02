@@ -87,7 +87,6 @@ export function CompanionForm({ companion }: CompanionFormProps) {
                 toast.error(msg);
             }
         } catch (error) {
-            console.error("Error submitting form:", error);
             toast.error("An unexpected error occurred");
         } finally {
             setIsLoading(false);
