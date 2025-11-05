@@ -162,7 +162,6 @@ export async function deleteCompanion(id: string) {
     };
 }
 
-//add delete session history and delete companion
 
 export const addSessionHistory = async (companionId: string) => {
     const { userId } = await auth();
@@ -358,10 +357,16 @@ export const getBookmarkedCompanions = async (userId: string) => {
         .select(`companions:companion_id (*)`)
         .eq("user_id", userId)
         .order("created_at", { ascending: false });
+
     if (error) throw new Error(error.message || "Failed to fetch bookmarked companions");
-    const bookmarkedCompanions = data.map((row) => ({
-        ...row.companions,
-        bookmarked: true,
-    }));
+
+    // Filter out null companions and map to the correct structure
+    const bookmarkedCompanions = data
+        .filter((row) => row.companions) // Remove any null companions
+        .map((row) => ({
+            ...(Array.isArray(row.companions) ? row.companions[0] : row.companions),
+            bookmarked: true,
+        }));
+
     return bookmarkedCompanions;
 };

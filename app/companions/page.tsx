@@ -25,7 +25,7 @@ const CompanionsLibrary = async ({ searchParams }: SearchParams) => {
                     <SubjectFilters />
                 </div>
             </section>
-            <section className="companions-grid">
+            <section className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 w-full gap-3">
                 {companions && companions.length > 0 ? (
                     companions.map((companion: any) => (
                         <CompanionCard

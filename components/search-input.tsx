@@ -45,7 +45,7 @@ const SearchIput = () => {
                 placeholder="Search by topic"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="outline-none"
+                className="outline-none placeholder:text-black2/50 w-full max-w-[450px]"
             />
         </div>
     );

@@ -8,6 +8,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { addUserBookmarks, deleteCompanion, removeUserBookmarks } from "@/lib/actions/companion.action";
 import { toast } from "sonner";
 import { Edit, Trash2, TrashIcon } from "lucide-react";
+import ConfirmModal from "./confirm-modal";
 
 interface CompanionCardProps {
     id: string;
@@ -87,13 +88,21 @@ const CompanionCard = ({
                             <Edit className="text-green-400 size-3.5" />
                         </button>
                     </Link>
-                    <button className="companion-bookmark" onClick={() => handleDelete(id)}>
-                        <Trash2 className="text-primary size-3.5" />
-                    </button>
+                    <ConfirmModal
+                        trigger={
+                            <button className="companion-bookmark">
+                                <Trash2 className="text-primary size-3.5" />
+                            </button>
+                        }
+                        title="Delete companion?"
+                        description="This action cannot be undone. This will permanently delete this companion."
+                        confirmText={isDeleting ? "Deleting..." : "Delete"}
+                        onConfirm={() => handleDelete(id)}
+                    />
                 </div>
             </div>
 
-            <h2 className="text-2xl font-bold">{name}</h2>
+            <h2 className="text-xl font-bold">{name}</h2>
             <p className="text-sm truncate">{topic}</p>
             <div className="flex items-center gap-2">
                 <Image src="/icons/clock.svg" alt="duration" width={13.5} height={13.5} />
