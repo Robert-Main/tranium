@@ -15,6 +15,7 @@ import { Airplay, Ellipsis, Trash } from "lucide-react";
 import {  deleteSessionHistory } from "@/lib/actions/companion.action";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import ConfirmModal from "./confirm-modal";
 
 interface CompanionsListProps {
     title?: string;
@@ -82,7 +83,7 @@ const CompanionsList = ({ title, companions, className, isSessionHistory = false
                                     </div>
                                 </Link>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="flex items-center gap-2">
                                 <div className="subject-badge w-fit">{companion.subject} </div>
                                 <div
                                     className="flex items-center justify-center rounded-lg w-fit p-2 md:hidden"
@@ -127,14 +128,18 @@ const CompanionsList = ({ title, companions, className, isSessionHistory = false
                                             </Link>
                                         </DropdownMenuItem>
                                         {isSessionHistory &&  (
-                                            <DropdownMenuItem
-                                                disabled={isDeleting}
-                                                onClick={() => handleDelete(companion.sessionId)}
-                                                className="text-red-500 hover:text-red-700"
-                                            >
-                                                <Trash className="text-red-400" />
-                                                Delete session
-                                            </DropdownMenuItem>
+                                            <ConfirmModal
+                                                trigger={
+                                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-500 hover:text-red-700">
+                                                        <Trash className="text-red-400" />
+                                                        Delete session
+                                                    </DropdownMenuItem>
+                                                }
+                                                title="Delete session?"
+                                                description="This action cannot be undone. This will permanently delete this session."
+                                                confirmText={isDeleting ? "Deleting..." : "Delete"}
+                                                onConfirm={() => handleDelete(companion.sessionId)}
+                                            />
                                         )}
                                     </DropdownMenuContent>
                                 </DropdownMenu>
