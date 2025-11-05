@@ -24,7 +24,7 @@ const Profile = async () => {
     const bookmarkedCompanions = await getBookmarkedCompanions(user.id);
 
     return (
-        <main className="container mx-auto px-4 py-8 max-w-7xl">
+        <main className="flex flex-col mx-auto px-4 py-4 max-w-7xl">
             <section className="flex justify-between gap-6 max-lg:flex-col items-start lg:items-center ">
                 <div className="flex gap-6 items-center">
                     <Image
@@ -65,16 +65,16 @@ const Profile = async () => {
                 </div>
             </section>
 
-            <Tabs defaultValue="companions" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 h-10 cursor-pointer ">
+            <Tabs defaultValue="companions" className="">
+                <TabsList className="grid  grid-cols-3 h-10 cursor-pointer ">
                     <TabsTrigger value="companions" className="text-base cursor-pointer">
-                        My Companions ({companions?.length || 0})
+                        Companions ({companions?.length || 0})
                     </TabsTrigger>
                     <TabsTrigger value="bookmarks" className="text-base cursor-pointer">
                         Bookmarks ({bookmarkedCompanions?.length || 0})
                     </TabsTrigger>
                     <TabsTrigger value="sessions" className="text-base cursor-pointer">
-                        Recent Sessions ({sessionHistory?.length || 0})
+                        Sessions ({sessionHistory?.length || 0})
                     </TabsTrigger>
                 </TabsList>
 
