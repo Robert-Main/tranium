@@ -24,15 +24,15 @@ const Profile = async () => {
     const bookmarkedCompanions = await getBookmarkedCompanions(user.id);
 
     return (
-        <main className="flex flex-col mx-auto px-4 py-4 max-w-7xl">
+        <main className="flex flex-col mx-auto px-4 py-4">
             <section className="flex justify-between gap-6 max-lg:flex-col items-start lg:items-center ">
-                <div className="flex gap-6 items-center">
+                <div className="hidden sm:flex gap-6 items-center">
                     <Image
                         src={user.imageUrl}
                         alt="user-image"
-                        width={110}
-                        height={110}
-                        className="rounded-2xl border-4 border-white shadow-lg"
+                        width={100}
+                        height={100}
+                        className="rounded-2xl border-4 border-white sm:w-[80px] sm:h-[80px] shadow-lg"
                     />
                     <div className="flex flex-col gap-2">
                         <h1 className="text-3xl font-bold">
