@@ -9,8 +9,11 @@ const Navbar = () => {
     return (
         <nav className="navbar">
             <Link href="/">
-                <div className="flex items-center gap-2.5 cursor-pointer">
-                    <Image src="/images/logo.svg" alt="logo" width={46} height={44} />
+                <div className="flex items-center gap-1 cursor-pointer rounded-full">
+                    <Image src="/images/TRANIUM-l.png" alt="logo" width={60} height={60} className="rounded-full mr-0" />
+                    <p className="font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                        Tranium
+                    </p>
                 </div>
             </Link>
 
