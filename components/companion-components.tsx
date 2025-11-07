@@ -191,12 +191,21 @@ const CompanionComponents = ({
                         <Image src={userImage} alt="user" width={100} height={100} className="rounded-lg" />
                         <p className="text-2xl font-bold">{userName}</p>
                     </div>
-                    <button className="btn-mic " onClick={handleToggleMic} disabled={callStatus !== CallStatus.ACTIVE}>
+                    <button
+                        className={cn(
+                            "btn-mic rounded-lg cursor-pointer w-full transition-colors text-white",
+                            isMuted ? "bg-red-400" : "bg-primary",
+                            callStatus !== CallStatus.ACTIVE && "bg-primary"
+                        )}
+                        onClick={handleToggleMic}
+                        disabled={callStatus !== CallStatus.ACTIVE}
+                    >
                         <Image
                             src={isMuted ? "/icons/mic-off.svg" : "/icons/mic-on.svg"}
                             alt="mic"
                             width={32}
                             height={32}
+                            className={cn(isMuted === true ? "bg-red-400" : "bg-primary")}
                         />
                         <p className="max-sm:hidden">{isMuted ? "Unmute Mic" : "Mute Mic"}</p>
                     </button>

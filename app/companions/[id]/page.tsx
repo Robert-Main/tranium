@@ -20,13 +20,11 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
     if (!user) redirect("/sign-in");
     if (!companionRes || !companionRes.success || !companionRes.data) redirect("/companions");
 
-    const { subject, name, duration, topic, voice, style } = companionRes.data;
+    const { subject, name, duration, topic } = companionRes.data;
 
     return (
         <main className="max-w-[1400px]">
-            {/* Enhanced Header Card */}
             <article className="relative overflow-hidden rounded-3xl border-2 border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-lg">
-                {/* Decorative Background Pattern */}
                 <div
                     className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl opacity-20"
                     style={{ backgroundColor: getSubjectColor(subject) }}
@@ -34,9 +32,7 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
 
                 <div className="relative z-10 p-8 max-md:p-6">
                     <div className="flex justify-between items-start gap-6 max-md:flex-col">
-                        {/* Left Section - Companion Info */}
                         <div className="flex items-start gap-6 flex-1">
-                            {/* Subject Icon */}
                             <div
                                 className="size-20 flex items-center justify-center rounded-2xl shadow-md transition-transform hover:scale-105 max-md:size-16"
                                 style={{ backgroundColor: getSubjectColor(subject) }}
@@ -50,7 +46,6 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
                                 />
                             </div>
 
-                            {/* Companion Details */}
                             <div className="flex flex-col gap-3 flex-1">
                                 <div className="flex items-center gap-3 flex-wrap">
                                     <h1 className="text-3xl font-bold text-gray-900 max-md:text-2xl">
@@ -60,7 +55,7 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
                                         className="capitalize text-sm font-medium px-3 py-1"
                                         style={{
                                             backgroundColor: getSubjectColor(subject),
-                                            color: 'white'
+                                            color: 'black'
                                         }}
                                     >
                                         {subject}
@@ -83,7 +78,6 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
                             </div>
                         </div>
 
-                        {/* Right Section - Duration Badge (Desktop) */}
                         <div className="hidden md:flex flex-col items-center gap-2 bg-white rounded-2xl px-6 py-4 border-2 border-gray-200 shadow-sm min-w-[120px]">
                             <Clock className="h-8 w-8 text-primary" />
                             <div className="text-center">
@@ -95,7 +89,6 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
                 </div>
             </article>
 
-            {/* Companion Components */}
             <CompanionComponents
                 {...companionRes.data}
                 companionId={id}

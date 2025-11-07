@@ -7,8 +7,8 @@ import React from "react";
 
 const navItems = [
     { label: "Home", href: "/" },
-    { label: "My Journey", href: "/my-journey" },
     { label: "Companions", href: "/companions" },
+    { label: "My Journey", href: "/my-journey" },
 ];
 
 const NavItems = () => {
