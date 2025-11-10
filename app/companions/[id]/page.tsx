@@ -24,13 +24,13 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
 
     return (
         <main className="max-w-[1400px]">
-            <article className="relative overflow-hidden rounded-3xl border-2 border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-lg">
+            <article className="relative overflow-hidden rounded-3xl border-2 border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-lg 0">
                 <div
-                    className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl opacity-20"
+                    className="absolute top-0 right-0 w-64 h-44 rounded-full blur-3xl opacity-20 "
                     style={{ backgroundColor: getSubjectColor(subject) }}
                 />
 
-                <div className="relative z-10 p-8 max-md:p-6">
+                <div className="relative z-10 p-6 max-md:p-6">
                     <div className="flex justify-between items-start gap-6 max-md:flex-col">
                         <div className="flex items-start gap-6 flex-1">
                             <div
@@ -78,10 +78,10 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
                             </div>
                         </div>
 
-                        <div className="hidden md:flex flex-col items-center gap-2 bg-white rounded-2xl px-6 py-4 border-2 border-gray-200 shadow-sm min-w-[120px]">
-                            <Clock className="h-8 w-8 text-primary" />
+                        <div className="hidden md:flex flex-col items-center gap-2 bg-white rounded-2xl px-6 py-4 border-2 border-gray-200 shadow-sm min-w-[100px]">
+                            <Clock className="h-5 w-5 text-primary" />
                             <div className="text-center">
-                                <p className="text-3xl font-bold text-gray-900">{duration}</p>
+                                <p className="text-xl font-bold text-gray-900">{duration}</p>
                                 <p className="text-sm text-gray-500 font-medium">minutes</p>
                             </div>
                         </div>

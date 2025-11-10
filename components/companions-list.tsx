@@ -53,7 +53,7 @@ const CompanionsList = ({ title, companions, className, isSessionHistory = false
             <div className="space-y-3">
                 {companions?.map((companion, index) => (
                     <div
-                        key={companion.id || index}
+                        key={ index}
                         className="group flex items-center gap-4 p-4 rounded-2xl border-2 border-gray-100 bg-white hover:border-gray-300 hover:shadow-md transition-all duration-200 max-md:flex-col max-md:items-start"
                     >
                         <Link

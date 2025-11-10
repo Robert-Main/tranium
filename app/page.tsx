@@ -9,8 +9,15 @@ const Page = async () => {
     const companionsData = await getAllCompanions({ limit: 5, page: 1 });
     const companions = companionsData;
     const recentSessionsData = await getSessionHistories(10);
+    const sessionHistory = Array.from(
+        new Map(
+            recentSessionsData
+                .flatMap((item: any) => item.companions)
+                .map((companion: any) => [companion.id, companion])
+        ).values()
+    );
 
-    const recentSessions = recentSessionsData.map((item: any) => item.companions);
+    // const recentSessions = recentSessionsData.map((item: any) => item.companions);
 
     return (
         <main >
@@ -24,7 +31,7 @@ const Page = async () => {
             <section className="home-section">
                 <CompanionsList
                     title="Recent Companions"
-                    companions={recentSessions}
+                    companions={sessionHistory}
                     isSessionHistory={true}
                     className="w-2/3 max-lg:w-full"
                 />
