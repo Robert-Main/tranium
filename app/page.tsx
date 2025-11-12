@@ -4,8 +4,11 @@ import CompanionsList from "@/components/companions-list";
 import CTA from "@/components/CTA";
 import { getAllCompanions, getSessionHistories } from "@/lib/actions/companion.action";
 import { getSubjectColor } from "@/lib/utils";
+import { currentUser } from "@clerk/nextjs/server";
 
 const Page = async () => {
+        const user = await currentUser();
+
     const companionsData = await getAllCompanions({ limit: 5, page: 1 });
     const companions = companionsData;
     const recentSessionsData = await getSessionHistories(10);
@@ -16,6 +19,8 @@ const Page = async () => {
                 .map((companion: any) => [companion.id, companion])
         ).values()
     );
+
+    console.log(companions);
 
     // const recentSessions = recentSessionsData.map((item: any) => item.companions);
 

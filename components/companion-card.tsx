@@ -10,6 +10,10 @@ import { toast } from "sonner";
 import { Edit, Trash2, Clock, Play, Bookmark, BookmarkCheck } from "lucide-react";
 import ConfirmModal from "./confirm-modal";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { createSupabaseClient } from "@/lib/supabase";
+import { CompanionForm } from "@/components/companion-form";
+import { useAuth } from "@clerk/nextjs";
 
 interface CompanionCardProps {
     id: string;
@@ -19,6 +23,7 @@ interface CompanionCardProps {
     duration: number;
     color: string;
     bookmarked: boolean;
+    author?: string;
 }
 
 const CompanionCard = ({
@@ -29,11 +34,39 @@ const CompanionCard = ({
     duration,
     color,
     bookmarked: initialBookmarked,
+    author,
 }: CompanionCardProps) => {
     const pathname = usePathname();
     const router = useRouter();
     const [bookmarked, setBookmarked] = useState(initialBookmarked);
     const [isDeleting, setIsDeleting] = useState(false);
+
+    const { userId } = useAuth();
+
+    const [isEditOpen, setIsEditOpen] = useState(false);
+    const [editLoading, setEditLoading] = useState(false);
+    const [editError, setEditError] = useState<string | null>(null);
+    const [fullCompanion, setFullCompanion] = useState<Companion | null>(null);
+
+    const isOwner = !!author && !!userId && author === userId;
+
+    const loadCompanion = async () => {
+        setEditLoading(true);
+        setEditError(null);
+        try {
+            const supabase = createSupabaseClient();
+            const { data, error } = await supabase.from("companions").select("*").eq("id", id).single();
+            if (error) {
+                setEditError(error.message || "Failed to load companion");
+            } else {
+                setFullCompanion(data as unknown as Companion);
+            }
+        } catch (e) {
+            setEditError("Failed to load companion");
+        } finally {
+            setEditLoading(false);
+        }
+    };
 
     const handleBookmark = async () => {
         if (bookmarked) {
@@ -98,7 +131,11 @@ const CompanionCard = ({
                         )}
                         title={bookmarked ? "Remove bookmark" : "Add bookmark"}
                     >
-                        {bookmarked ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4 cursor-pointer" />}
+                        {bookmarked ? (
+                            <BookmarkCheck className="w-4 h-4" />
+                        ) : (
+                            <Bookmark className="w-4 h-4 cursor-pointer" />
+                        )}
                     </button>
                 </div>
 
@@ -133,29 +170,58 @@ const CompanionCard = ({
                         </button>
                     </Link>
 
-                    <Link href={`/companions/${id}/edit`}>
-                        <button
-                            className="cursor-pointer p-2.5 rounded-xl border-2 border-gray-200 hover:bg-green-50 hover:border-green-500 hover:text-green-600 transition-all duration-200 bg-white"
-                            title="Edit companion"
+                    {isOwner && (
+                        <Dialog
+                            open={isEditOpen}
+                            onOpenChange={(open) => {
+                                setIsEditOpen(open);
+                                if (open) {
+                                    loadCompanion();
+                                } else {
+                                    setFullCompanion(null);
+                                    setEditError(null);
+                                }
+                            }}
                         >
-                            <Edit className="w-4 h-4 " />
-                        </button>
-                    </Link>
+                            <DialogTrigger asChild>
+                                <button
+                                    type="button"
+                                    className="cursor-pointer p-2.5 rounded-xl border-2 border-gray-200 hover:bg-green-50 hover:border-green-500 hover:text-green-600 transition-all duration-200 bg-white"
+                                    title="Edit companion"
+                                >
+                                    <Edit className="w-4 h-4 " />
+                                </button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-2xl bg-white">
+                                <DialogHeader>
+                                    <DialogTitle>Edit your Companion builder</DialogTitle>
+                                </DialogHeader>
+                                {!editLoading && !editError && fullCompanion && (
+                                    <CompanionForm
+                                        companion={fullCompanion as any}
+                                        onClose={() => setIsEditOpen(false)}
+                                    />
+                                )}
+                            </DialogContent>
+                        </Dialog>
+                    )}
 
-                    <ConfirmModal
-                        trigger={
-                            <button
-                                className="cursor-pointer p-2.5 rounded-xl border-2 border-gray-200 hover:bg-red-50 hover:border-red-500 hover:text-red-600 transition-all duration-200 bg-white"
-                                title="Delete companion"
-                            >
-                                <Trash2 className="w-4 h-4" />
-                            </button>
-                        }
-                        title="Delete companion?"
-                        description="This action cannot be undone. This will permanently delete this companion."
-                        confirmText={isDeleting ? "Deleting..." : "Delete"}
-                        onConfirm={() => handleDelete(id)}
-                    />
+                    {isOwner && (
+                        <ConfirmModal
+                            trigger={
+                                <button
+                                    className="cursor-pointer p-2.5 rounded-xl border-2 border-gray-200 hover:bg-red-50 hover:border-red-500 hover:text-red-600 transition-all duration-200 bg-white"
+                                    title="Delete companion"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                            }
+                            title="Delete companion?"
+                            description="This action cannot be undone. This will permanently delete this companion."
+                            confirmText={isDeleting ? "Deleting..." : "Delete"}
+                            onConfirm={() => handleDelete(id)}
+                        />
+                    )}
                 </div>
             </div>
         </article>

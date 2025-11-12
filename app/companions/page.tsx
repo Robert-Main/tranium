@@ -37,6 +37,7 @@ const CompanionsLibrary = async ({ searchParams }: SearchParams) => {
                             duration={companion.duration}
                             bookmarked={companion.bookmarked ?? false}
                             color={getSubjectColor(companion.subject)}
+                            author={companion.author}
                         />
                     ))
                 ) : (

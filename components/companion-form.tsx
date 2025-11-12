@@ -18,9 +18,10 @@ import { Loader2 } from "lucide-react";
 
 interface CompanionFormProps {
     companion?: Companion;
+    onClose?: () => void;
 }
 
-export function CompanionForm({ companion }: CompanionFormProps) {
+export function CompanionForm({ companion, onClose }: CompanionFormProps) {
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
     const isEditMode = !!companion;
@@ -74,14 +75,14 @@ export function CompanionForm({ companion }: CompanionFormProps) {
             if (res && res.success) {
                 toast.success(isEditMode ? "Companion updated successfully!" : "Companion created successfully!");
 
-                if (res.data?.id) {
-                    router.push(`/companions/${res.data.id}`);
-                } else {
+                if (onClose) onClose();
+                router.refresh();
+
+                if (!isEditMode) {
                     router.push(`/companions/`);
                 }
             } else {
-                const msg =
-                    res && !res.success
+                const msg = res && !res.success
                         ? res.error || `Failed to ${isEditMode ? "update" : "create"} companion`
                         : `Failed to ${isEditMode ? "update" : "create"} companion`;
                 toast.error(msg);

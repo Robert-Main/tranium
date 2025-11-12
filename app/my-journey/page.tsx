@@ -91,6 +91,7 @@ const Profile = async () => {
                                     duration={companion.duration}
                                     color={getSubjectColor(companion.subject)}
                                     bookmarked={companion.bookmarked || false}
+                                    author={companion.author}
                                 />
                             ))}
                         </div>
@@ -115,6 +116,7 @@ const Profile = async () => {
                                     duration={companion.duration}
                                     color={getSubjectColor(companion.subject)}
                                     bookmarked={companion.bookmarked || false}
+                                    author={companion.author}
                                 />
                             ))}
                         </div>
@@ -139,6 +141,7 @@ const Profile = async () => {
                                     duration={companion.duration}
                                     color={getSubjectColor(companion.subject)}
                                     bookmarked={companion.bookmarked || false}
+                                    author={companion.author}
                                 />
                             ))}
                         </div>
