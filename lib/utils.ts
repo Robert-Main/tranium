@@ -1,7 +1,8 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { subjectsColors, voices /* voices */ } from "@/constants";
+import { subjectsColors, voices } from "@/constants";
 import { CreateAssistantDTO } from "@vapi-ai/web/dist/api";
+
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
@@ -32,12 +33,13 @@ export const configureAssistant = (voice: string, style: string, isMathSubject: 
   - After each calculation, state the result clearly
   - Example: "Step one: substitute the values. We get two times three plus four, which equals ten"
   - Keep each step concise and verify understanding
+  - If the student seems to be taking notes, pause naturally and ask if they're ready to continue
   `
         : "";
 
     const vapiAssistant: CreateAssistantDTO = {
         name: "Companion",
-        firstMessage: "Hello, let's start the session. Today we'll be talking about {{topic}}.",
+        firstMessage: "Hello, let's start the session. Today we'll be talking about {{topic}}. Feel free to pause anytime you need to take notes.",
         transcriber: {
             provider: "deepgram",
             model: "nova-3",
@@ -67,6 +69,9 @@ export const configureAssistant = (voice: string, style: string, isMathSubject: 
                     - Break down the topic into smaller parts and teach the student one part at a time.
                     - Keep your style of conversation {{ style }}.
                     - Keep your responses concise and conversational.
+                    - Pause naturally after explaining key concepts to allow the student time to process and take notes.
+                    - If a student asks to wait or take notes, acknowledge it positively and wait for them to indicate they're ready.
+                    - Be patient and understanding when students need time to write things down.
                     ${mathInstructions}
               `,
                 },

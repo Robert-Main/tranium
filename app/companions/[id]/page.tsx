@@ -5,8 +5,9 @@ import { currentUser } from "@clerk/nextjs/server";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import React from "react";
-import { Clock, BookOpen } from "lucide-react";
+import { Clock, BookOpen, StickyNote } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import NotesSection from "@/components/notes-section";
 
 interface CompanionSessionProps {
     params: Promise<{ id: string }>;
@@ -27,78 +28,107 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
     }
 
     return (
-        <main className="max-w-[1400px]">
-            <article className="relative overflow-hidden rounded-3xl border-2 border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-lg 0">
-                <div
-                    className="absolute top-0 right-0 w-64 h-44 rounded-full blur-3xl opacity-20 "
-                    style={{ backgroundColor: getSubjectColor(subject) }}
-                />
+        <main className="max-w-[1600px] mx-auto px-4 py-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left Column - Session Info & Content */}
+                <div className="lg:col-span-2 space-y-6">
+                    {/* Session Header Card */}
+                    <article className="relative overflow-hidden rounded-3xl border border-gray-200/60 bg-gradient-to-br from-white via-gray-50/30 to-white shadow-xl backdrop-blur-sm">
+                        <div
+                            className="absolute top-0 right-0 w-96 h-96 rounded-full blur-[100px] opacity-10"
+                            style={{ backgroundColor: getSubjectColor(subject) }}
+                        />
+                        <div
+                            className="absolute bottom-0 left-0 w-64 h-64 rounded-full blur-[80px] opacity-5"
+                            style={{ backgroundColor: getSubjectColor(subject) }}
+                        />
 
-                <div className="relative z-10 p-6 max-md:p-6">
-                    <div className="flex justify-between items-start gap-6 max-md:flex-col">
-                        <div className="flex items-start gap-6 flex-1">
-                            <div
-                                className="size-20 flex items-center justify-center rounded-2xl shadow-md transition-transform hover:scale-105 max-md:size-16"
-                                style={{ backgroundColor: getSubjectColor(subject) }}
-                            >
-                                <Image
-                                    src={`/icons/${subject}.svg`}
-                                    alt={subject}
-                                    width={40}
-                                    height={40}
-                                    className="max-md:w-8 max-md:h-8"
-                                />
-                            </div>
-
-                            <div className="flex flex-col gap-3 flex-1">
-                                <div className="flex items-center gap-3 flex-wrap">
-                                    <h1 className="text-3xl font-bold text-gray-900 max-md:text-2xl">
-                                        {name}
-                                    </h1>
-                                    <Badge
-                                        className="capitalize text-sm font-medium px-3 py-1"
-                                        style={{
-                                            backgroundColor: getSubjectColor(subject),
-                                            color: 'black'
-                                        }}
-                                    >
-                                        {subject}
-                                    </Badge>
+                        <div className="relative z-10 p-8 max-md:p-5">
+                            <div className="flex items-start gap-6 max-md:flex-col">
+                                {/* Subject Icon */}
+                                <div
+                                    className="size-24 flex items-center justify-center rounded-3xl shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl max-md:size-20 ring-4 ring-white/50"
+                                    style={{ backgroundColor: getSubjectColor(subject) }}
+                                >
+                                    <Image
+                                        src={`/icons/${subject}.svg`}
+                                        alt={subject}
+                                        width={48}
+                                        height={48}
+                                        className="max-md:w-10 max-md:h-10 drop-shadow-sm"
+                                    />
                                 </div>
 
-                                <div className="flex items-start gap-2">
-                                    <BookOpen className="h-5 w-5 text-gray-500 mt-0.5 flex-shrink-0" />
-                                    <p className="text-base text-gray-700 leading-relaxed">
-                                        {topic}
-                                    </p>
-                                </div>
+                                {/* Session Details */}
+                                <div className="flex flex-col gap-4 flex-1 min-w-0">
+                                    <div className="flex items-start justify-between gap-4 flex-wrap">
+                                        <div className="space-y-2">
+                                            <div className="flex items-center gap-3 flex-wrap">
+                                                <h1 className="text-4xl font-bold text-gray-900 max-md:text-2xl tracking-tight">
+                                                    {name}
+                                                </h1>
+                                                <Badge
+                                                    className="capitalize text-sm font-semibold px-4 py-1.5 shadow-sm"
+                                                    style={{
+                                                        backgroundColor: getSubjectColor(subject),
+                                                        color: 'black'
+                                                    }}
+                                                >
+                                                    {subject}
+                                                </Badge>
+                                            </div>
+                                        </div>
 
-                                <div className="flex items-center gap-2 text-gray-600">
-                                    <Clock className="h-5 w-5" />
-                                    <span className="text-sm font-medium">
-                                        Estimated duration: {duration} minutes
-                                    </span>
+                                        {/* Duration Badge - Desktop */}
+                                        <div className="hidden md:flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-2xl px-5 py-3 border border-gray-200 shadow-md">
+                                            <Clock className="h-5 w-5 text-gray-700" />
+                                            <div className="text-center">
+                                                <span className="text-2xl font-bold text-gray-900">{duration}</span>
+                                                <span className="text-sm text-gray-500 font-medium ml-1">min</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Topic Description */}
+                                    <div className="flex items-start gap-3 p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-gray-200/50">
+                                        <BookOpen className="h-5 w-5 text-gray-600 mt-0.5 flex-shrink-0" />
+                                        <p className="text-base text-gray-700 leading-relaxed">
+                                            {topic}
+                                        </p>
+                                    </div>
+
+                                    {/* Duration - Mobile */}
+                                    <div className="flex md:hidden items-center gap-2 text-gray-600 px-4 py-2 bg-white/60 backdrop-blur-sm rounded-xl border border-gray-200/50 w-fit">
+                                        <Clock className="h-5 w-5" />
+                                        <span className="text-sm font-medium">
+                                            {duration} minutes
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    </article>
 
-                        <div className="hidden md:flex flex-col items-center gap-2 bg-white rounded-2xl px-6 py-4 border-2 border-gray-200 shadow-sm min-w-[100px]">
-                            <Clock className="h-5 w-5 text-primary" />
-                            <div className="text-center">
-                                <p className="text-xl font-bold text-gray-900">{duration}</p>
-                                <p className="text-sm text-gray-500 font-medium">minutes</p>
-                            </div>
+                    {/* Main Content */}
+                    <CompanionComponents
+                        {...companionRes.data}
+                        companionId={id}
+                        userName={user.firstName!}
+                        userImage={user.imageUrl!}
+                    />
+                </div>
+
+                {/* Right Column - Notes Section */}
+                <div className="lg:col-span-1">
+                    <div className="sticky top-6 space-y-4">
+                        <div className="flex items-center gap-2 mb-4">
+                            <StickyNote className="h-6 w-6 text-gray-700" />
+                            <h2 className="text-2xl font-bold text-gray-900">Notes</h2>
                         </div>
+                        <NotesSection companionId={id} path={`/companions/${id}`} />
                     </div>
                 </div>
-            </article>
-
-            <CompanionComponents
-                {...companionRes.data}
-                companionId={id}
-                userName={user.firstName!}
-                userImage={user.imageUrl!}
-            />
+            </div>
         </main>
     );
 };
