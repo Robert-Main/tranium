@@ -163,12 +163,23 @@ const CompanionCard = ({
                 <div className="border-t border-gray-200" />
 
                 <div className="flex gap-2 items-center">
-                    <Link href={`/companions/${id}`} className="flex-1">
-                        <button className="cursor-pointer group w-full bg-primary hover:bg-primary/90 text-white rounded-xl font-semibold transition-all duration-200 shadow-md hover:shadow-lg px-4 py-2.5 flex items-center justify-center gap-2">
-                            <Play className="w-4 h-4 transition-transform group-hover:scale-110 cursor-pointer" />
+                    {isOwner ? (
+                        <Link href={`/companions/${id}`} className="flex-1">
+                            <button className="cursor-pointer group w-full bg-primary hover:bg-primary/90 text-white rounded-xl font-semibold transition-all duration-200 shadow-md hover:shadow-lg px-4 py-2.5 flex items-center justify-center gap-2">
+                                <Play className="w-4 h-4 transition-transform group-hover:scale-110 cursor-pointer" />
+                                Launch Lesson
+                            </button>
+                        </Link>
+                    ) : (
+                        <button
+                            className="w-full bg-gray-200 text-gray-500 rounded-xl font-semibold px-4 py-2.5 flex items-center justify-center gap-2 cursor-not-allowed opacity-70 flex-1"
+                            title="Only the creator can start this lesson"
+                            disabled
+                        >
+                            <Play className="w-4 h-4" />
                             Launch Lesson
                         </button>
-                    </Link>
+                    )}
 
                     {isOwner && (
                         <Dialog

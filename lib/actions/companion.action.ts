@@ -241,7 +241,36 @@ export const deleteSessionHistory = async (sessionId: string) => {
             error: "Unauthorized - Please sign in",
         };
     }
-    const { data, error } = await supabase.from("session_history").delete().eq("id", sessionId).select().single();
+
+    // Fetch session to verify ownership
+    const { data: sessionRow, error: fetchError } = await supabase
+        .from("session_history")
+        .select("id,user_id")
+        .eq("id", sessionId)
+        .single();
+
+    if (fetchError || !sessionRow) {
+        return {
+            success: false,
+            error: fetchError?.message || "Session not found",
+        };
+    }
+
+    if (sessionRow.user_id !== userId) {
+        return {
+            success: false,
+            error: "Unauthorized - You can only delete your own session",
+        };
+    }
+
+    const { data, error } = await supabase
+        .from("session_history")
+        .delete()
+        .eq("id", sessionId)
+        .eq("user_id", userId)
+        .select()
+        .single();
+
     if (error) {
         return {
             success: false,

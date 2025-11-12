@@ -20,7 +20,11 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
     if (!user) redirect("/sign-in");
     if (!companionRes || !companionRes.success || !companionRes.data) redirect("/companions");
 
-    const { subject, name, duration, topic } = companionRes.data;
+    const { subject, name, duration, topic, author } = companionRes.data;
+
+    if (author && user.id !== author) {
+        redirect("/companions");
+    }
 
     return (
         <main className="max-w-[1400px]">
