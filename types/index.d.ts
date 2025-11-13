@@ -82,3 +82,13 @@ interface CompanionComponentProps {
   voice: string;
   style: string;
 }
+
+interface Note {
+  id: string;
+  user_id: string;
+  companion_id: string;
+  session_id: string | null;
+  content: string;
+  created_at: string;
+  updated_at: string | null;
+};
