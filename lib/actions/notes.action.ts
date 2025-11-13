@@ -34,8 +34,8 @@ export async function listNotesByCompanion(companionId: string) {
   return (data as Note[]) || [];
 }
 
-// Add a note for the current user
-export async function addNote(formData: FormData) {
+// Add a note for the current user (use direct params instead of FormData for consistency)
+export async function addNote({ companionId, content, path, sessionId }: { companionId: string; content: string; path: string; sessionId?: string | null; }) {
   const { userId } = await auth();
   const supabase = createSupabaseAdminClient();
 
@@ -43,23 +43,23 @@ export async function addNote(formData: FormData) {
     return { success: false, error: "Unauthorized - Please sign in" } as const;
   }
 
-  const companionId = String(formData.get("companionId") || "").trim();
-  const content = String(formData.get("content") || "").trim();
-  const pathToRevalidate = String(formData.get("path") || "/");
-  const sessionId = formData.get("sessionId") ? String(formData.get("sessionId")) : null;
+  const companionIdTrimmed = String(companionId || "").trim();
+  const contentTrimmed = String(content || "").trim();
+  const pathToRevalidate = String(path || "/");
+  const normalizedSessionId = sessionId ? String(sessionId) : null;
 
-  if (!companionId) {
+  if (!companionIdTrimmed) {
     return { success: false, error: "Missing companion id" } as const;
   }
-  if (!content) {
+  if (!contentTrimmed) {
     return { success: false, error: "Note content cannot be empty" } as const;
   }
 
   const { error } = await supabase.from("notes").insert({
     user_id: userId,
-    companion_id: companionId,
-    session_id: sessionId,
-    content,
+    companion_id: companionIdTrimmed,
+    session_id: normalizedSessionId,
+    content: contentTrimmed,
   });
 
   if (error) {
@@ -72,8 +72,8 @@ export async function addNote(formData: FormData) {
   return { success: true } as const;
 }
 
-// Optional: Delete a note (only the owner)
-export async function deleteNote(formData: FormData) {
+// Optional: Delete a note (only the owner) - use direct params
+export async function deleteNote({ noteId, path }: { noteId: string; path: string }) {
   const { userId } = await auth();
   const supabase = createSupabaseAdminClient();
 
@@ -81,18 +81,87 @@ export async function deleteNote(formData: FormData) {
     return { success: false, error: "Unauthorized - Please sign in" } as const;
   }
 
-  const noteId = String(formData.get("noteId") || "");
-  const pathToRevalidate = String(formData.get("path") || "/");
+  const id = String(noteId || "").trim();
+  const pathToRevalidate = String(path || "/");
 
   const { error } = await supabase
     .from("notes")
     .delete()
-    .eq("id", noteId)
+    .eq("id", id)
     .eq("user_id", userId);
 
   if (error) {
     console.error("Supabase error (delete note):", error);
     return { success: false, error: error.message || "Failed to delete note" } as const;
+  }
+
+  revalidatePath(pathToRevalidate);
+  return { success: true } as const;
+}
+
+
+// Update a note (only the owner) - use direct params
+export async function updateNote({ noteId, content, path }: { noteId: string; content: string; path: string }) {
+  const { userId } = await auth();
+  const supabase = createSupabaseAdminClient();
+
+  if (!userId) {
+    return { success: false, error: "Unauthorized - Please sign in" } as const;
+  }
+
+  const id = String(noteId || "").trim();
+  const contentTrimmed = String(content || "").trim();
+  const pathToRevalidate = String(path || "/");
+
+  if (!id) {
+    return { success: false, error: "Missing note id" } as const;
+  }
+  if (!contentTrimmed) {
+    return { success: false, error: "Note content cannot be empty" } as const;
+  }
+
+  const { error } = await supabase
+    .from("notes")
+    .update({ content: contentTrimmed, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .eq("user_id", userId);
+
+  if (error) {
+    console.error("Supabase error (update note):", error);
+    return { success: false, error: error.message || "Failed to update note" } as const;
+  }
+
+  revalidatePath(pathToRevalidate);
+  return { success: true } as const;
+}
+
+// Bulk delete notes (only the owner's notes)
+export async function deleteNotesBulk({ noteIds, path }: { noteIds: string[]; path: string }) {
+  const { userId } = await auth();
+  const supabase = createSupabaseAdminClient();
+
+  if (!userId) {
+    return { success: false, error: "Unauthorized - Please sign in" } as const;
+  }
+
+  const ids = Array.isArray(noteIds)
+    ? noteIds.map((id) => String(id || "").trim()).filter(Boolean)
+    : [];
+  const pathToRevalidate = String(path || "/");
+
+  if (ids.length === 0) {
+    return { success: false, error: "No notes selected" } as const;
+  }
+
+  const { error } = await supabase
+    .from("notes")
+    .delete()
+    .in("id", ids)
+    .eq("user_id", userId);
+
+  if (error) {
+    console.error("Supabase error (bulk delete notes):", error);
+    return { success: false, error: error.message || "Failed to delete notes" } as const;
   }
 
   revalidatePath(pathToRevalidate);

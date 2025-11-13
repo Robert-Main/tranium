@@ -17,9 +17,9 @@ Run the following SQL in your Supabase project (SQL editor):
 create table if not exists public.notes (
   id uuid primary key default gen_random_uuid(),
   user_id text not null,
-  companion_id text not null,
-  session_id text null,
-  content text not null,
+  companion_id uuid not null,
+  session_id uuid null,
+  content varchar not null,
   created_at timestamptz not null default now(),
   updated_at timestamptz null
 );
