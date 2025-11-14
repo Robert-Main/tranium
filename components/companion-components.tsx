@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "./ui/textarea";
 import { addNote } from "@/lib/actions/notes.action";
+import { addSummary } from "@/lib/actions/summaries.action";
 
 interface CompanionComponentsProps {
     companionId: string;
@@ -471,7 +472,24 @@ const CompanionComponents = ({
 
         if (Array.isArray(data.summaries) && data.summaries.length > 0) {
             setSummaryPoints(data.summaries);
-            toast.success("Summary generated!");
+            // Save to DB
+            try {
+                const result = await addSummary({
+                    companionId,
+                    points: data.summaries,
+                    title: topic,
+                    path: pathname || `/companions/${companionId}`,
+                });
+                if (result?.success) {
+                    toast.success("Summary generated and saved!");
+                } else {
+                    toast.message("Summary generated", { description: "Could not save automatically" });
+                }
+            } catch (e) {
+                console.error("Failed to save summary:", e);
+                toast.message("Summary generated", { description: "Save failed" });
+            }
+            router.refresh();
         } else {
             throw new Error("Invalid summary format");
         }

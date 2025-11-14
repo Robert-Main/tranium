@@ -5,10 +5,13 @@ import { currentUser } from "@clerk/nextjs/server";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import React from "react";
-import { Clock, BookOpen, StickyNote } from "lucide-react";
+import { Clock, BookOpen, StickyNote, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NotesSection from "@/components/notes-section";
+import SummariesSection from "@/components/summaries-section";
 import { listNotesByCompanion } from "@/lib/actions/notes.action";
+import { listSummariesByCompanion } from "@/lib/actions/summaries.action";
 
 interface CompanionSessionProps {
     params: Promise<{ id: string }>;
@@ -28,7 +31,9 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
         redirect("/companions");
     }
 
-    const notes  = await listNotesByCompanion(id);
+    const notes = await listNotesByCompanion(id);
+    const summaries = await listSummariesByCompanion(id);
+    console.log(summaries);
 
     return (
         <main className="max-w-[1600px] mx-auto px-4 py-6">
@@ -114,12 +119,51 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
                 </div>
 
                 <div className="lg:col-span-1">
-                    <div className="sticky top-6 space-y-4">
-                        <div className="flex items-center gap-2 mb-4">
-                            <StickyNote className="h-6 w-6 text-gray-700" />
-                            <h2 className="text-2xl font-bold text-gray-900">Notes</h2>
-                        </div>
-                        <NotesSection initialNotes={notes} companionId={id} path={`/companions/${id}`} />
+                    <div className="sticky top-6">
+                        <Tabs defaultValue="notes" className="w-full">
+                            <TabsList className="grid w-full grid-cols-2 mb-4 bg-white/80 backdrop-blur-sm border border-gray-200 shadow-sm p-1 h-auto">
+                                <TabsTrigger
+                                    value="notes"
+                                    className="flex items-center gap-2 py-3 data-[state=active]:bg-white data-[state=active]:shadow-md rounded-lg transition-all"
+                                >
+                                    <StickyNote className="h-4 w-4" />
+                                    <span className="font-semibold">Notes</span>
+                                    {notes && notes.length > 0 && (
+                                        <Badge variant="secondary" className="ml-1 h-5 min-w-5 flex items-center justify-center px-1.5 text-xs">
+                                            {notes.length}
+                                        </Badge>
+                                    )}
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="summaries"
+                                    className="flex items-center gap-2 py-3 data-[state=active]:bg-white data-[state=active]:shadow-md rounded-lg transition-all"
+                                >
+                                    <FileText className="h-4 w-4" />
+                                    <span className="font-semibold">Summaries</span>
+                                    {summaries && summaries.length > 0 && (
+                                        <Badge variant="secondary" className="ml-1 h-5 min-w-5 flex items-center justify-center px-1.5 text-xs">
+                                            {summaries.length}
+                                        </Badge>
+                                    )}
+                                </TabsTrigger>
+                            </TabsList>
+
+                            <TabsContent value="notes" className="mt-0 space-y-4">
+                                <NotesSection
+                                    initialNotes={notes}
+                                    companionId={id}
+                                    path={`/companions/${id}`}
+                                />
+                            </TabsContent>
+
+                            <TabsContent value="summaries" className="mt-0 space-y-4">
+                                <SummariesSection
+                                    initialSummaries={summaries}
+                                    companionId={id}
+                                    path={`/companions/${id}`}
+                                />
+                            </TabsContent>
+                        </Tabs>
                     </div>
                 </div>
             </div>
