@@ -66,3 +66,19 @@ Notes
   - NEXT_PUBLIC_SUPABASE_ANON_KEY
   - SUPABASE_SERVICE_ROLE_KEY
 - Check browser/network logs and server logs for Supabase errors.
+
+
+## Summaries table (Smart Summary)
+To store AI-generated summaries separately from notes, run the SQL in supabase_summaries.sql using Supabase SQL Editor:
+
+1) Open Supabase Dashboard → SQL → New query.
+2) Paste the contents of supabase_summaries.sql from the repo root.
+3) Review the RLS policy section:
+   - If you use Supabase Auth (auth.uid), uncomment the corresponding policies and comment out the JWT ones.
+   - If you use Clerk with JWTs, keep the provided JWT-sub policies.
+4) Click Run.
+
+Verification:
+- After running, you should see a public.summaries table.
+- Try generating a Smart Summary in the app; a new row should appear with points as a JSON array.
+- listSummariesByCompanion, addSummary, deleteSummary actions are implemented in lib/actions/summaries.action.ts.

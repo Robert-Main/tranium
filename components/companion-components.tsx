@@ -427,78 +427,62 @@ const CompanionComponents = ({
     };
 
     const generateSmartSummary = async () => {
-        if (messages.length === 0) {
-            toast.error("No conversation to summarize yet!");
+    if (messages.length === 0) {
+        toast.error("No conversation to summarize yet!");
+        return;
+    }
+
+    setGeneratingSummary(true);
+    setShowSummary(true);
+
+    try {
+        // Get all assistant messages
+        const assistantMessages = messages
+            .filter((m) => m.role === "assistant")
+            .map((m) => m.content)
+            .join(" ");
+
+        if (assistantMessages.length < 100) {
+            toast.error("Not enough content to summarize yet!");
+            setGeneratingSummary(false);
             return;
         }
 
-        setGeneratingSummary(true);
-        setShowSummary(true);
+        // Call our API route instead of Anthropic directly
+        const response = await fetch("/api/generate-summary", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                topic,
+                subject,
+                transcript: assistantMessages,
+            }),
+        });
 
-        try {
-            // Get all assistant messages
-            const assistantMessages = messages
-                .filter(m => m.role === "assistant")
-                .map(m => m.content)
-                .join(" ");
-
-            if (assistantMessages.length < 100) {
-                toast.error("Not enough content to summarize yet!");
-                setGeneratingSummary(false);
-                return;
-            }
-
-            // Call AI to generate summary
-            const response = await fetch("https://api.anthropic.com/v1/messages", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    model: "claude-sonnet-4-20250514",
-                    max_tokens: 1000,
-                    messages: [
-                        {
-                            role: "user",
-                            content: `You are summarizing a lesson about "${topic}" in the subject of ${subject}.
-
-Based on this conversation transcript, extract 5-8 brief, clear summary points (each 10-20 words max). Make them actionable and easy to understand for a student reviewing their notes.
-
-Transcript:
-${assistantMessages}
-
-Respond ONLY with a JSON array of strings, no markdown, no preamble:
-["point 1", "point 2", ...]`
-                        }
-                    ],
-                }),
-            });
-
-            const data = await response.json();
-            const text = data.content
-                .map((item: any) => (item.type === "text" ? item.text : ""))
-                .filter(Boolean)
-                .join("");
-
-            // Parse the response
-            const cleanText = text.replace(/```json|```/g, "").trim();
-            const summaries = JSON.parse(cleanText);
-
-            if (Array.isArray(summaries) && summaries.length > 0) {
-                setSummaryPoints(summaries);
-                toast.success("Summary generated!");
-            } else {
-                throw new Error("Invalid summary format");
-            }
-        } catch (error) {
-            console.error("Error generating summary:", error);
-            toast.error("Failed to generate summary. Please try again.");
-            setSummaryPoints([]);
-        } finally {
-            setGeneratingSummary(false);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Failed to generate summary");
         }
-    };
 
+        const data = await response.json();
+
+
+        if (Array.isArray(data.summaries) && data.summaries.length > 0) {
+            setSummaryPoints(data.summaries);
+            toast.success("Summary generated!");
+        } else {
+            throw new Error("Invalid summary format");
+        }
+    } catch (error) {
+        console.error("Error generating summary:", error);
+        toast.error(error instanceof Error ? error.message : "Failed to generate summary");
+        setSummaryPoints([]);
+    } finally {
+        setGeneratingSummary(false);
+    }
+};
     return (
         <>
             <section className="flex flex-col h-full">
