@@ -32,7 +32,6 @@ export async function listSummariesByCompanion(companionId: string) {
         return [] as Summary[];
     }
 
-    // points comes back as JSON; ensure it's an array of strings
     const normalized = (data || []).map((row: any) => ({
         ...row,
         points: Array.isArray(row.points) ? row.points : [],
@@ -40,7 +39,6 @@ export async function listSummariesByCompanion(companionId: string) {
     return normalized;
 }
 
-// Add a summary for the current user
 export async function addSummary({
     companionId,
     points,
@@ -160,7 +158,6 @@ export async function deleteSummary({ summaryId, path }: { summaryId: string; pa
     return { success: true } as const;
 }
 
-// Bulk delete summaries
 export async function deleteSummariesBulk({ summaryIds, path }: { summaryIds: string[]; path: string }) {
     const { userId } = await auth();
     const supabase = createSupabaseAdminClient();

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { listNotesByCompanion, addNote, deleteNote, updateNote, deleteNotesBulk } from "@/lib/actions/notes.action";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -58,6 +58,15 @@ export default function NotesSection({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
   const router = useRouter();
+
+  const canMultiSelect = (initialNotes?.length || 0) > 1;
+
+  useEffect(() => {
+    if (!canMultiSelect && multiSelect) {
+      setMultiSelect(false);
+      setSelectedIds(new Set());
+    }
+  }, [canMultiSelect, multiSelect]);
 
   const form = useForm<NoteFormValues>({
     resolver: zodResolver(noteFormSchema),
@@ -132,7 +141,6 @@ export default function NotesSection({
     }
   };
 
-  // Multi-select helpers
   const toggleMultiSelect = () => {
     setMultiSelect((prev) => {
       const next = !prev;
@@ -178,11 +186,10 @@ export default function NotesSection({
   };
 
   return (
-    <div className="space-y-6">
-      {/* Add Note Form */}
+    <div className="space-y-3">
       <div className="bg-gradient-to-br from-white to-gray-50/50 border border-gray-200 rounded-2xl p-6 shadow-lg">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
             <FormField
               control={form.control}
               name="content"
@@ -225,10 +232,8 @@ export default function NotesSection({
         </Form>
       </div>
 
-      {/* Notes List */}
       <div className="space-y-3">
-        {/* Bulk actions toolbar */}
-        {initialNotes?.length > 0 && (
+        {canMultiSelect && (
           <div className="flex items-center justify-between py-2">
             <div className="flex items-center gap-2">
               <Button variant={multiSelect ? "secondary" : "outline"} size="sm" onClick={toggleMultiSelect}>
@@ -284,14 +289,13 @@ export default function NotesSection({
             </p>
           </div>
         ) : (
-          <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+          <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar no-scrollbar overscroll-contain">
             {initialNotes?.map((note) => (
               <div
                 key={note.id}
                 className="group bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:border-gray-300"
               >
                 <div className="flex items-start justify-between gap-3">
-                  {/* Checkbox for multi-select */}
                   {multiSelect && (
                     <div className="pt-1">
                       <input
