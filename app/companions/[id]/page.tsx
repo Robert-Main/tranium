@@ -33,7 +33,6 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
 
     const notes = await listNotesByCompanion(id);
     const summaries = await listSummariesByCompanion(id);
-    console.log(summaries);
 
     return (
         <main className="max-w-[1600px] mx-auto px-4 py-6">
