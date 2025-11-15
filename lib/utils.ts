@@ -82,3 +82,84 @@ export const configureAssistant = (voice: string, style: string, isMathSubject: 
     };
     return vapiAssistant;
 };
+
+
+export const normalizePoint = (s: string) =>
+    s.toLowerCase()
+        .replace(/\s+/g, " ")
+        .replace(/[\s\-*_•.]+$/g, "")
+        .trim();
+
+export const extractKeyPoints = (text: string): string[] => {
+    if (!text || text.trim().length < 30) return [];
+
+    const points: string[] = [];
+    const sentences = text.split(/(?<=[.!?])\s+/)
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+
+    // First pass: Look for bullet points or numbered lists
+    const lines = text.split(/\n+/);
+    for (const raw of lines) {
+        const line = raw.trim();
+        if (!line || line.length < 40) continue;
+
+        const bulletMatch = line.match(/^\s*(?:[-*•]|\d+[\.)\-:])\s+(.+)$/);
+        if (bulletMatch) {
+            const content = bulletMatch[1].trim();
+            if (content.length >= 40 && (content.length >= 60 || /[.!?]$/.test(content))) {
+                points.push(content.endsWith('.') || content.endsWith('!') || content.endsWith('?')
+                    ? content
+                    : content + '.');
+            }
+        }
+    }
+
+    // Second pass: Look for sentences with key indicators
+    const keywordPattern = /\b(key\s*point|important|remember|note\s*that|takeaway|summary|crucial|essential|main\s*idea|means|refers\s*to|defined\s*as|for\s*example)\b/i;
+
+    for (let i = 0; i < sentences.length; i++) {
+        const sent = sentences[i];
+        if (sent.length < 40 || sent.length > 350) continue;
+
+        if (keywordPattern.test(sent)) {
+            let completePoint = sent;
+            if (i + 1 < sentences.length &&
+                !sent.match(/[.!?]$/) &&
+                (completePoint.length + sentences[i + 1].length) < 350) {
+                completePoint += ' ' + sentences[i + 1];
+                i++;
+            }
+            points.push(completePoint);
+        }
+    }
+
+    // Third pass: If we have very few points, look for complete, informative sentences
+    if (points.length < 2) {
+        for (const sent of sentences) {
+            if (sent.length >= 50 && sent.length <= 300 && /[.!?]$/.test(sent)) {
+                const hasSubstance = /\b(is|are|means|refers|defined|causes|results|affects|includes|such as|because|when|if|can|will|shows|indicates)\b/i.test(sent);
+                const notTransitional = !/^(so|and|but|however|therefore|thus|first|second|next|finally|in conclusion)\b/i.test(sent);
+
+                if (hasSubstance && notTransitional) {
+                    points.push(sent);
+                }
+            }
+        }
+    }
+
+    // Deduplicate and limit
+    const seen = new Set<string>();
+    const cleaned: string[] = [];
+
+    for (const p of points) {
+        const norm = normalizePoint(p);
+        if (!seen.has(norm) && p.length >= 40 && p.length <= 350) {
+            seen.add(norm);
+            cleaned.push(p);
+        }
+        if (cleaned.length >= 4) break;
+    }
+
+    return cleaned;
+};

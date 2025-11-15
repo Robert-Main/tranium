@@ -196,7 +196,7 @@ export default function SummariesSection({ companionId, path, initialSummaries }
 
             {/* Edit Summary Modal */}
             <Dialog open={editOpen} onOpenChange={(o) => { if (!o) { setEditOpen(false); setEditId(null); setEditing(false); }}}>
-                <DialogContent>
+                <DialogContent className="bg-white">
                     <DialogHeader>
                         <DialogTitle>Edit Summary</DialogTitle>
                     </DialogHeader>

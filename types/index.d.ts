@@ -103,7 +103,7 @@ interface Summary {
     updated_at: string | null;
 }
 
-enum CallStatus {
+ enum CallStatus {
     INACTIVE = "INACTIVE",
     CONNECTING = "CONNECTING",
     ACTIVE = "ACTIVE",
@@ -117,6 +117,17 @@ interface SavedMessage {
 }
 
 interface CompanionProps {
+    companionId: string;
+    subject: string;
+    topic: string;
+    style: string;
+    name: string;
+    userName: string;
+    userImage: string;
+    voice: string;
+}
+
+ interface CompanionComponentsProps {
     companionId: string;
     subject: string;
     topic: string;

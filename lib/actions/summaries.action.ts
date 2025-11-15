@@ -15,7 +15,6 @@ export type Summary = {
     updated_at: string | null;
 };
 
-// List summaries for the current user and companion
 export async function listSummariesByCompanion(companionId: string) {
     const { userId } = await auth();
     if (!userId) return [] as Summary[];
@@ -92,7 +91,6 @@ export async function addSummary({
     return { success: true } as const;
 }
 
-// Edit summary
 export async function updateSummary({
     summaryId,
     title,
@@ -140,7 +138,6 @@ export async function updateSummary({
     return { success: true } as const;
 }
 
-// Delete a summary (only the owner)
 export async function deleteSummary({ summaryId, path }: { summaryId: string; path: string }) {
     const { userId } = await auth();
     const supabase = createSupabaseAdminClient();
