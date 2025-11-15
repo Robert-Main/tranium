@@ -13,7 +13,8 @@ import {
 import { Button } from "@/components/ui/button";
 
 interface ConfirmModalProps {
-    trigger: React.ReactNode;
+    trigger?: React.ReactNode; // Optional: allow children as trigger for backward compatibility
+    children?: React.ReactNode; // If provided, used as trigger content
     title?: string;
     description?: string;
     confirmText?: string;
@@ -23,6 +24,7 @@ interface ConfirmModalProps {
 
 const ConfirmModal: React.FC<ConfirmModalProps> = ({
     trigger,
+    children,
     title = "Are you absolutely sure?",
     description = "This action cannot be undone.",
     confirmText = "Delete",
@@ -42,9 +44,11 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
         }
     };
 
+    const triggerNode = trigger ?? children;
+
     return (
         <Dialog open={open} onOpenChange={setOpen} >
-            <DialogTrigger asChild>{trigger}</DialogTrigger>
+            {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
             <DialogContent className="bg-amber-50">
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
