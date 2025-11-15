@@ -33,7 +33,6 @@ export async function createCompanion(formData: CreateCompanion) {
             };
         }
 
-        console.log("Created companion:", data);
         return {
             success: true,
             data,
