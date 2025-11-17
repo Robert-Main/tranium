@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { deleteSummary, updateSummary } from "@/lib/actions/summaries.action";
 import { Button } from "@/components/ui/button";
 import { Trash2, Loader2, CheckSquare, Square, Pencil } from "lucide-react";
@@ -31,6 +31,15 @@ export default function SummariesSection({ companionId, path, initialSummaries }
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [bulkDeleting, setBulkDeleting] = useState(false);
     const router = useRouter();
+
+    const canMultiSelect = (initialSummaries?.length || 0) > 1;
+
+    useEffect(() => {
+        if (!canMultiSelect && multiSelect) {
+            setMultiSelect(false);
+            setSelectedIds(new Set());
+        }
+    }, [canMultiSelect, multiSelect]);
 
     // Edit modal state
     const [editOpen, setEditOpen] = useState(false);
@@ -88,6 +97,7 @@ export default function SummariesSection({ companionId, path, initialSummaries }
         <div className="w-full space-y-4">
             <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900">Saved Summaries</h3>
+                {canMultiSelect && (
                 <div className="flex items-center gap-2">
                     <Button
                         variant={multiSelect ? "secondary" : "outline"}
@@ -116,11 +126,13 @@ export default function SummariesSection({ companionId, path, initialSummaries }
                         </ConfirmModal>
                     )}
                 </div>
+                )}
             </div>
 
             {initialSummaries?.length === 0 ? (
                 <div className="p-4 text-sm text-gray-600 border rounded-lg bg-white">No summaries saved yet</div>
             ) : (
+                <div className="max-h-[800px] overflow-y-auto pr-2 custom-scrollbar overscroll-contain">
                 <ul className="space-y-3">
                     {initialSummaries.map((s) => (
                         <li key={s.id} className="p-4 rounded-lg border bg-white">
@@ -192,9 +204,9 @@ export default function SummariesSection({ companionId, path, initialSummaries }
                         </li>
                     ))}
                 </ul>
+                </div>
             )}
 
-            {/* Edit Summary Modal */}
             <Dialog open={editOpen} onOpenChange={(o) => { if (!o) { setEditOpen(false); setEditId(null); setEditing(false); }}}>
                 <DialogContent className="bg-white">
                     <DialogHeader>

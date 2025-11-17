@@ -20,8 +20,6 @@ const Page = async () => {
         ).values()
     );
 
-    console.log(companions);
-
     // const recentSessions = recentSessionsData.map((item: any) => item.companions);
 
     return (

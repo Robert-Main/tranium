@@ -79,7 +79,6 @@ export const useVapiEvents = ({
                         const points = extractKeyPoints(transcript);
 
                         if (points.length > 0) {
-                            console.log("Extracted key points:", points);
 
                             const uniqueNew = points.filter((p) => {
                                 const norm = normalizePoint(p);

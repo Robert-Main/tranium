@@ -14,7 +14,6 @@ export type Note = {
   updated_at: string | null;
 };
 
-// List notes for the current user and companion
 export async function listNotesByCompanion(companionId: string) {
   const { userId } = await auth();
   if (!userId) return [] as Note[];
@@ -34,7 +33,6 @@ export async function listNotesByCompanion(companionId: string) {
   return (data as Note[]) || [];
 }
 
-// Add a note for the current user (use direct params instead of FormData for consistency)
 export async function addNote({ companionId, content, path, sessionId }: { companionId: string; content: string; path: string; sessionId?: string | null; }) {
   const { userId } = await auth();
   const supabase = createSupabaseAdminClient();
@@ -67,12 +65,10 @@ export async function addNote({ companionId, content, path, sessionId }: { compa
     return { success: false, error: error.message || "Failed to add note" } as const;
   }
 
-  // Revalidate the page showing the notes
   revalidatePath(pathToRevalidate);
   return { success: true } as const;
 }
 
-// Optional: Delete a note (only the owner) - use direct params
 export async function deleteNote({ noteId, path }: { noteId: string; path: string }) {
   const { userId } = await auth();
   const supabase = createSupabaseAdminClient();
@@ -100,7 +96,6 @@ export async function deleteNote({ noteId, path }: { noteId: string; path: strin
 }
 
 
-// Update a note (only the owner) - use direct params
 export async function updateNote({ noteId, content, path }: { noteId: string; content: string; path: string }) {
   const { userId } = await auth();
   const supabase = createSupabaseAdminClient();
@@ -135,7 +130,6 @@ export async function updateNote({ noteId, content, path }: { noteId: string; co
   return { success: true } as const;
 }
 
-// Bulk delete notes (only the owner's notes)
 export async function deleteNotesBulk({ noteIds, path }: { noteIds: string[]; path: string }) {
   const { userId } = await auth();
   const supabase = createSupabaseAdminClient();

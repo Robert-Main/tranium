@@ -33,10 +33,9 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
 
     const notes = await listNotesByCompanion(id);
     const summaries = await listSummariesByCompanion(id);
-    console.log(summaries);
 
     return (
-        <main className="max-w-[1600px] mx-auto px-4 py-6">
+        <main className="max-w-[1600px] mx-auto px-4 py-6 h-dvh overflow-y-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
                     <article className="relative overflow-hidden rounded-3xl border border-gray-200/60 bg-gradient-to-br from-white via-gray-50/30 to-white shadow-xl backdrop-blur-sm">
@@ -121,7 +120,7 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
                 <div className="lg:col-span-1">
                     <div className="sticky top-6">
                         <Tabs defaultValue="notes" className="w-full">
-                            <TabsList className="grid w-full grid-cols-2 mb-4 bg-white/80 backdrop-blur-sm border border-gray-200 shadow-sm p-1 h-auto">
+                            <TabsList className="grid w-full grid-cols-2 mb-2 bg-white/80 backdrop-blur-sm border border-gray-200 shadow-sm p-1 h-auto">
                                 <TabsTrigger
                                     value="notes"
                                     className="flex items-center gap-2 py-3 data-[state=active]:bg-white data-[state=active]:shadow-md rounded-lg transition-all"
