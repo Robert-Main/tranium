@@ -3,7 +3,7 @@
 import { useState, useTransition, useEffect } from "react";
 import { deleteSummary, updateSummary } from "@/lib/actions/summaries.action";
 import { Button } from "@/components/ui/button";
-import { Trash2, Loader2, CheckSquare, Square, Pencil } from "lucide-react";
+import { Trash2, Loader2, CheckSquare, Square, Pencil, FileText, Calendar } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import ConfirmModal from "@/components/confirm-modal";
@@ -57,6 +57,13 @@ export default function SummariesSection({ companionId, path, initialSummaries }
         });
     };
 
+    const selectAll = () => {
+        const allIds = initialSummaries?.map((s) => s.id) || [];
+        setSelectedIds(new Set(allIds));
+    };
+
+    const clearSelection = () => setSelectedIds(new Set());
+
     const onDeleteOne = async (id: string) => {
         setDeletingId(id);
         const result = await deleteSummary({ summaryId: id, path });
@@ -81,7 +88,7 @@ export default function SummariesSection({ companionId, path, initialSummaries }
             const { deleteSummariesBulk } = await import("@/lib/actions/summaries.action");
             const result = await deleteSummariesBulk({ summaryIds: ids, path });
             if (result?.success) {
-                toast.success("Selected summaries deleted");
+                toast.success(`${ids.length} summar${ids.length > 1 ? 'ies' : 'y'} deleted`);
                 setSelectedIds(new Set());
                 setMultiSelect(false);
                 router.refresh();
@@ -95,141 +102,235 @@ export default function SummariesSection({ companionId, path, initialSummaries }
 
     return (
         <div className="w-full space-y-4">
-            <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">Saved Summaries</h3>
-                {canMultiSelect && (
-                <div className="flex items-center gap-2">
-                    <Button
-                        variant={multiSelect ? "secondary" : "outline"}
-                        size="sm"
-                        onClick={() => setMultiSelect((v) => !v)}
-                    >
-                        {multiSelect ? "Cancel" : "Select"}
-                    </Button>
-                    {multiSelect && (
+            {/* Header with Multi-select */}
+            {canMultiSelect && (
+                <div className="flex items-center justify-between px-1">
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant={multiSelect ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setMultiSelect((v) => !v)}
+                            className={multiSelect ? "bg-slate-900 hover:bg-slate-800" : ""}
+                        >
+                            {multiSelect ? "Done" : "Select"}
+                        </Button>
+                        {multiSelect && (
+                            <>
+                                <Button variant="ghost" size="sm" onClick={selectAll} className="text-slate-600">
+                                    Select all
+                                </Button>
+                                <Button variant="ghost" size="sm" onClick={clearSelection} className="text-slate-600">
+                                    Clear
+                                </Button>
+                            </>
+                        )}
+                    </div>
+                    {multiSelect && selectedIds.size > 0 && (
                         <ConfirmModal
                             title="Delete selected summaries?"
                             description="This action cannot be undone."
                             onConfirm={onDeleteBulk}
                         >
-                            <Button variant="destructive" size="sm" disabled={bulkDeleting}>
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                disabled={bulkDeleting}
+                                className="rounded-xl"
+                            >
                                 {bulkDeleting ? (
                                     <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Deleting
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Deleting...
                                     </>
                                 ) : (
                                     <>
-                                        <Trash2 className="mr-2 h-4 w-4" /> Delete Selected
+                                        <Trash2 className="mr-2 h-4 w-4" />
+                                        Delete ({selectedIds.size})
                                     </>
                                 )}
                             </Button>
                         </ConfirmModal>
                     )}
                 </div>
-                )}
-            </div>
+            )}
 
+            {/* Summaries List */}
             {initialSummaries?.length === 0 ? (
-                <div className="p-4 text-sm text-gray-600 border rounded-lg bg-white">No summaries saved yet</div>
+                <div className="text-center py-16 px-4 bg-slate-50 border border-dashed border-slate-300 rounded-2xl">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white border border-slate-200 mb-4 shadow-sm">
+                        <FileText className="h-7 w-7 text-slate-400" />
+                    </div>
+                    <p className="text-sm font-medium text-slate-900 mb-1">No summaries yet</p>
+                    <p className="text-xs text-slate-500">
+                        Summaries will appear here once generated
+                    </p>
+                </div>
             ) : (
-                <div className="max-h-[800px] overflow-y-auto pr-2 custom-scrollbar overscroll-contain">
-                <ul className="space-y-3">
-                    {initialSummaries.map((s) => (
-                        <li key={s.id} className="p-4 rounded-lg border bg-white">
-                            <div className="flex items-start justify-between gap-3">
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        {multiSelect && (
-                                            <button
-                                                className="text-gray-600"
-                                                onClick={() => toggleSelect(s.id)}
+                <div className="max-h-[800px] overflow-y-auto pr-1 custom-scrollbar overscroll-contain">
+                    <ul className="space-y-3">
+                        {initialSummaries.map((s) => (
+                            <li
+                                key={s.id}
+                                className={`group relative bg-white border rounded-xl p-4 transition-all duration-200 ${
+                                    multiSelect && selectedIds.has(s.id)
+                                        ? 'border-slate-900 shadow-md bg-slate-50'
+                                        : 'border-slate-200 hover:border-slate-300 hover:shadow-sm'
+                                }`}
+                            >
+                                <div className="flex items-start gap-3">
+                                    {multiSelect && (
+                                        <div className="pt-0.5">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedIds.has(s.id)}
+                                                onChange={() => toggleSelect(s.id)}
+                                                className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-400 cursor-pointer"
                                                 aria-label={selectedIds.has(s.id) ? "Unselect" : "Select"}
-                                            >
-                                                {selectedIds.has(s.id) ? (
-                                                    <CheckSquare className="h-5 w-5" />
-                                                ) : (
-                                                    <Square className="h-5 w-5" />
-                                                )}
-                                            </button>
-                                        )}
-                                        <p className="text-sm text-gray-500">
-                                            {new Date(s.created_at).toLocaleString()}
-                                        </p>
-                                    </div>
-                                    {s.title && <p className="font-medium mb-2">{s.title}</p>}
-                                    <ul className="list-disc pl-5 space-y-1 text-sm text-gray-800">
-                                        {s.points.map((p, idx) => (
-                                            <li key={idx}>{p}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                                {!multiSelect && (
-                                    <div className="flex items-center gap-1">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="text-gray-600 hover:text-gray-800"
-                                            onClick={() => {
-                                                setEditId(s.id);
-                                                setEditTitle(s.title || "");
-                                                setEditPointsText((s.points || []).join("\n"));
-                                                setEditOpen(true);
-                                            }}
-                                            aria-label="Edit summary"
-                                        >
-                                            <Pencil className="h-5 w-5" />
-                                        </Button>
+                                            />
+                                        </div>
+                                    )}
 
-                                        <ConfirmModal
-                                            title="Delete summary?"
-                                            description="This action cannot be undone."
-                                            onConfirm={() => onDeleteOne(s.id)}
-                                        >
+                                    <div className="flex-1 min-w-0">
+                                        {/* Date */}
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Calendar className="h-3.5 w-3.5 text-slate-400" />
+                                            <p className="text-xs text-slate-500 font-medium">
+                                                {new Date(s.created_at).toLocaleDateString("en-US", {
+                                                    month: "short",
+                                                    day: "numeric",
+                                                    year: "numeric",
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                })}
+                                            </p>
+                                        </div>
+
+                                        {/* Title */}
+                                        {s.title && (
+                                            <h4 className="font-semibold text-slate-900 mb-3 text-sm">
+                                                {s.title}
+                                            </h4>
+                                        )}
+
+                                        {/* Points */}
+                                        <ul className="space-y-1.5">
+                                            {s.points.map((p, idx) => (
+                                                <li
+                                                    key={idx}
+                                                    className="flex items-start gap-2 text-sm text-slate-700"
+                                                >
+                                                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-slate-400 mt-1.5 flex-shrink-0" />
+                                                    <span className="flex-1">{p}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    {/* Action Buttons */}
+                                    {!multiSelect && (
+                                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                disabled={deletingId === s.id}
+                                                className="h-8 w-8 text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg"
+                                                onClick={() => {
+                                                    setEditId(s.id);
+                                                    setEditTitle(s.title || "");
+                                                    setEditPointsText((s.points || []).join("\n"));
+                                                    setEditOpen(true);
+                                                }}
+                                                aria-label="Edit summary"
                                             >
-                                                {deletingId === s.id ? (
-                                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                                ) : (
-                                                    <Trash2 className="h-5 w-5" />
-                                                )}
+                                                <Pencil className="h-4 w-4" />
                                             </Button>
-                                        </ConfirmModal>
-                                    </div>
-                                )}
-                            </div>
-                        </li>
-                    ))}
-                </ul>
+
+                                            <ConfirmModal
+                                                title="Delete summary?"
+                                                description="This action cannot be undone."
+                                                onConfirm={() => onDeleteOne(s.id)}
+                                            >
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg"
+                                                    disabled={deletingId === s.id}
+                                                >
+                                                    {deletingId === s.id ? (
+                                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                                    ) : (
+                                                        <Trash2 className="h-4 w-4" />
+                                                    )}
+                                                </Button>
+                                            </ConfirmModal>
+                                        </div>
+                                    )}
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
                 </div>
             )}
 
-            <Dialog open={editOpen} onOpenChange={(o) => { if (!o) { setEditOpen(false); setEditId(null); setEditing(false); }}}>
-                <DialogContent className="bg-white">
+            {/* Edit Dialog */}
+            <Dialog open={editOpen} onOpenChange={(o) => {
+                if (!o) {
+                    setEditOpen(false);
+                    setEditId(null);
+                    setEditing(false);
+                }
+            }}>
+                <DialogContent className="bg-white rounded-2xl max-w-lg">
                     <DialogHeader>
-                        <DialogTitle>Edit Summary</DialogTitle>
+                        <DialogTitle className="text-lg font-semibold text-slate-900">Edit Summary</DialogTitle>
                     </DialogHeader>
-                    <div className="space-y-3">
+                    <div className="space-y-4 py-4">
                         <div>
-                            <label className="text-sm text-gray-700">Title (optional)</label>
-                            <Input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} placeholder="Enter a title" />
+                            <label className="text-sm font-medium text-slate-700 mb-2 block">
+                                Title (optional)
+                            </label>
+                            <Input
+                                value={editTitle}
+                                onChange={(e) => setEditTitle(e.target.value)}
+                                placeholder="Enter a title"
+                                className="bg-slate-50 border-slate-200 focus:border-slate-400 rounded-xl"
+                            />
                         </div>
                         <div>
-                            <label className="text-sm text-gray-700">Points (one per line)</label>
-                            <Textarea rows={8} value={editPointsText} onChange={(e) => setEditPointsText(e.target.value)} placeholder="Write each point on a new line" />
+                            <label className="text-sm font-medium text-slate-700 mb-2 block">
+                                Points (one per line)
+                            </label>
+                            <Textarea
+                                rows={8}
+                                value={editPointsText}
+                                onChange={(e) => setEditPointsText(e.target.value)}
+                                placeholder="Write each point on a new line"
+                                className="bg-slate-50 border-slate-200 focus:border-slate-400 rounded-xl resize-none"
+                            />
                         </div>
                     </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => { setEditOpen(false); setEditId(null); }} disabled={editing}>Cancel</Button>
+                    <DialogFooter className="gap-2">
+                        <Button
+                            variant="outline"
+                            onClick={() => {
+                                setEditOpen(false);
+                                setEditId(null);
+                            }}
+                            disabled={editing}
+                            className="rounded-xl"
+                        >
+                            Cancel
+                        </Button>
                         <Button
                             onClick={async () => {
                                 if (!editId) return;
                                 const pts = editPointsText.split(/\r?\n/).map((p) => p.trim()).filter(Boolean);
                                 setEditing(true);
-                                const res = await updateSummary({ summaryId: editId, title: editTitle.trim() || null, points: pts, path });
+                                const res = await updateSummary({
+                                    summaryId: editId,
+                                    title: editTitle.trim() || null,
+                                    points: pts,
+                                    path
+                                });
                                 setEditing(false);
                                 if (res?.success) {
                                     toast.success("Summary updated");
@@ -241,12 +342,36 @@ export default function SummariesSection({ companionId, path, initialSummaries }
                                 }
                             }}
                             disabled={editing}
+                            className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl"
                         >
-                            {editing ? "Saving..." : "Save"}
+                            {editing ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Saving...
+                                </>
+                            ) : (
+                                "Save Changes"
+                            )}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            <style jsx global>{`
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: 6px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: #cbd5e1;
+                    border-radius: 10px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: #94a3b8;
+                }
+            `}</style>
         </div>
     );
 }

@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/layout/navbar";
 import { ClerkProvider} from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner";
+import NetworkErrorToast from "@/components/common/network-error-toast";
 
 const bricolage = Bricolage_Grotesque({
     variable: "--font-bricolage",
@@ -25,6 +26,7 @@ export default function RootLayout({
             <body className={`${bricolage.variable} antialiased`}>
                 <ClerkProvider appearance={{ variables: { colorPrimary: "fe5933" } }}>
                     <Toaster />
+                    <NetworkErrorToast />
                     <Navbar />
 
                     {children}
