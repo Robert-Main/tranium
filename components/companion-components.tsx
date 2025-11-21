@@ -1,6 +1,6 @@
 "use client";
 
-import { configureAssistant } from "@/lib/utils";
+import { configureAssistant, normalizePoint } from "@/lib/utils";
 import { vapi } from "@/lib/vapi.sdk";
 import React, { useEffect, useState } from "react";
 import { LottieRefCurrentProps } from "lottie-react";
@@ -13,7 +13,7 @@ import { CompanionControls } from "@/components/companion/companion-controls";
 import { LiveTranscript } from "@/components/companion/live-transcript";
 import { PauseDialog } from "@/components/companion/pause-dialog";
 import { SummaryDialog } from "@/components/companion/summary-dialog";
-import { useVapiEvents } from "./hooks/use-vapi=event";
+import { useVapiEvents } from "./hooks/use-vapi-events";
 import { CallStatus } from "@/lib/call-status";
 import type { CallStatusValue } from "@/lib/call-status";
 
@@ -36,6 +36,7 @@ const CompanionComponents = ({
     const [savedNotes, setSavedNotes] = useState<string[]>([]);
     const [autoSaveKeyPoints, setAutoSaveKeyPoints] = useState(true);
     const savedKeyPointsRef = React.useRef<Set<string>>(new Set());
+    const savedSummariesRef = React.useRef<Set<string>>(new Set());
     const terminationHandledRef = React.useRef(false);
     const isPausedByUserRef = React.useRef(false);
     const [showSummary, setShowSummary] = useState(false);
@@ -46,6 +47,93 @@ const CompanionComponents = ({
     const pathname = usePathname();
     const LottieRef = React.useRef<LottieRefCurrentProps>(null);
     const isMathSubject = subject.toLowerCase() === "maths" || subject.toLowerCase() === "math";
+
+    // Session persistence key per companion
+    const storageKey = React.useMemo(() => `companion_session_${companionId}`,[companionId]);
+    const savedPointsKey = React.useMemo(() => `companion_saved_points_${companionId}`,[companionId]);
+    const savedSummariesKey = React.useMemo(() => `companion_saved_summaries_${companionId}`,[companionId]);
+
+    // Load previous session on mount
+    useEffect(() => {
+        try {
+            if (typeof window === "undefined") return;
+            const raw = localStorage.getItem(storageKey);
+            if (!raw) return;
+            const saved = JSON.parse(raw);
+            if (Array.isArray(saved?.messages) && saved.messages.length > 0) {
+                const resume = window.confirm("Resume your previous session transcript?");
+                if (resume) {
+                    setMessages(saved.messages as SavedMessage[]);
+                    // Mark as active so controls reflect ongoing context; user can reconnect when ready
+                    setCallStatus(CallStatus.ACTIVE);
+                } else {
+                    localStorage.removeItem(storageKey);
+                }
+            }
+        } catch (e) {
+            console.warn("Failed to load previous session:", e);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [storageKey]);
+
+    // Load persisted saved key points across sessions (used to avoid duplicate auto-saves)
+    useEffect(() => {
+        try {
+            if (typeof window === "undefined") return;
+            const raw = localStorage.getItem(savedPointsKey);
+            if (!raw) return;
+            const arr = JSON.parse(raw);
+            if (Array.isArray(arr)) {
+                const s = new Set<string>();
+                for (const it of arr) {
+                    if (typeof it === "string" && it.trim()) s.add(it);
+                }
+                if (s.size > 0) savedKeyPointsRef.current = s;
+            }
+        } catch (e) {
+            console.warn("Failed to load saved key points:", e);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [savedPointsKey]);
+
+    // Load persisted saved summaries across sessions (avoid duplicate summary saves)
+    useEffect(() => {
+        try {
+            if (typeof window === "undefined") return;
+            const raw = localStorage.getItem(savedSummariesKey);
+            if (!raw) return;
+            const arr = JSON.parse(raw);
+            if (Array.isArray(arr)) {
+                const s = new Set<string>();
+                for (const it of arr) {
+                    if (typeof it === "string" && it.trim()) s.add(it);
+                }
+                if (s.size > 0) savedSummariesRef.current = s;
+            }
+        } catch (e) {
+            console.warn("Failed to load saved summaries:", e);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [savedSummariesKey]);
+
+    // Persist messages as they evolve
+    useEffect(() => {
+        try {
+            if (typeof window === "undefined") return;
+            const payload = JSON.stringify({ messages });
+            localStorage.setItem(storageKey, payload);
+        } catch (e) {
+            // ignore
+        }
+    }, [messages, storageKey]);
+
+    // Clear saved session when finished
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        if (callStatus === CallStatus.FINISHED) {
+            try { localStorage.removeItem(storageKey); } catch (_) {}
+        }
+    }, [callStatus, storageKey]);
 
     // Lottie animation control
     useEffect(() => {
@@ -73,6 +161,15 @@ const CompanionComponents = ({
         isPausedByUserRef,
         savedKeyPointsRef,
         onRefresh: () => router.refresh(),
+        onKeyPointsSaved: (normalized) => {
+            try {
+                if (typeof window === "undefined") return;
+                const existingRaw = localStorage.getItem(savedPointsKey);
+                const existingArr: string[] = existingRaw ? JSON.parse(existingRaw) : [];
+                const merged = Array.from(new Set([...(existingArr || []), ...normalized]));
+                localStorage.setItem(savedPointsKey, JSON.stringify(merged));
+            } catch (_) {}
+        }
     });
 
     const handleToggleMic = async () => {
@@ -133,11 +230,27 @@ const CompanionComponents = ({
         }
     };
 
+    // Build a compact recap from previous messages so the assistant can continue
+    const buildRecap = () => {
+        try {
+            if (!messages || messages.length === 0) return "";
+            const last = messages.slice(-10);
+            const lines = last.map((m) => {
+                const role = m.role === "assistant" ? name : userName || "You";
+                const content = String(m.content || "").trim().slice(0, 220);
+                return `${role}: ${content}`;
+            });
+            const recap = lines.join("\n");
+            return recap.length > 1500 ? recap.slice(0, 1500) : recap;
+        } catch {
+            return "";
+        }
+    };
+
     const handleConnect = async () => {
         setCallStatus(CallStatus.CONNECTING);
         terminationHandledRef.current = false;
         isPausedByUserRef.current = false;
-        savedKeyPointsRef.current.clear();
 
         try {
             const assistanceOverride = {
@@ -145,11 +258,11 @@ const CompanionComponents = ({
                     topic,
                     subject,
                     style,
+                    recap: buildRecap(),
                 },
                 clientMessages: ["transcript"],
                 serverMessages: ["transcript"],
-            };
-            // @ts-expect-error
+            } as any;
             await vapi.start(configureAssistant(voice, style, isMathSubject), assistanceOverride);
         } catch (error) {
             console.error("Error connecting to companion:", error);
@@ -211,6 +324,16 @@ const CompanionComponents = ({
 
             if (Array.isArray(data.summaries) && data.summaries.length > 0) {
                 setSummaryPoints(data.summaries);
+
+                // Build a stable normalized signature for this summary to avoid duplicate saves
+                const normalizedPoints = data.summaries.map((p: string) => normalizePoint(p)).sort();
+                const signature = normalizePoint(`${topic || ''}`) + '|' + normalizedPoints.join('||');
+
+                if (savedSummariesRef.current.has(signature)) {
+                    toast.message("Summary generated", { description: "Already saved earlier. Not saving again." });
+                    return; // do not attempt to save duplicate
+                }
+
                 try {
                     const result = await addSummary({
                         companionId,
@@ -219,6 +342,16 @@ const CompanionComponents = ({
                         path: pathname || `/companions/${companionId}`,
                     });
                     if (result?.success) {
+                        // Persist signature to avoid future duplicates
+                        savedSummariesRef.current.add(signature);
+                        try {
+                            if (typeof window !== 'undefined') {
+                                const existingRaw = localStorage.getItem(savedSummariesKey);
+                                const existingArr: string[] = existingRaw ? JSON.parse(existingRaw) : [];
+                                const merged = Array.from(new Set([...(existingArr || []), signature]));
+                                localStorage.setItem(savedSummariesKey, JSON.stringify(merged));
+                            }
+                        } catch (_) {}
                         toast.success("Summary generated and saved!");
                     } else {
                         toast.message("Summary generated", { description: "Could not save automatically" });
