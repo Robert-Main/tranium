@@ -73,6 +73,8 @@ export const configureAssistant = (voice: string, style: string, isMathSubject: 
                     - If a student asks to wait or take notes, acknowledge it positively and wait for them to indicate they're ready.
                     - Be patient and understanding when students need time to write things down.
                     ${mathInstructions}
+                    - If a session recap is provided, use it strictly as prior context to continue without repeating the same explanations. Recap:
+                    {{ recap }}
               `,
                 },
             ],

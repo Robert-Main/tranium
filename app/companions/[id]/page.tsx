@@ -5,7 +5,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import React from "react";
-import { Clock, BookOpen, StickyNote, FileText } from "lucide-react";
+import { Clock, BookOpen, StickyNote, FileText, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NotesSection from "@/components/notes-section";
@@ -117,54 +117,60 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
                     />
                 </div>
 
-                <div className="lg:col-span-1">
-                    <div className="sticky top-6">
-                        <Tabs defaultValue="notes" className="w-full">
-                            <TabsList className="grid w-full grid-cols-2 mb-2 bg-white/80 backdrop-blur-sm border border-gray-200 shadow-sm p-1 h-auto">
-                                <TabsTrigger
-                                    value="notes"
-                                    className="flex items-center gap-2 py-3 data-[state=active]:bg-white data-[state=active]:shadow-md rounded-lg transition-all"
-                                >
-                                    <StickyNote className="h-4 w-4" />
-                                    <span className="font-semibold">Notes</span>
-                                    {notes && notes.length > 0 && (
-                                        <Badge variant="secondary" className="ml-1 h-5 min-w-5 flex items-center justify-center px-1.5 text-xs">
-                                            {notes.length}
-                                        </Badge>
-                                    )}
-                                </TabsTrigger>
-                                <TabsTrigger
-                                    value="summaries"
-                                    className="flex items-center gap-2 py-3 data-[state=active]:bg-white data-[state=active]:shadow-md rounded-lg transition-all"
-                                >
-                                    <FileText className="h-4 w-4" />
-                                    <span className="font-semibold">Summaries</span>
-                                    {summaries && summaries.length > 0 && (
-                                        <Badge variant="secondary" className="ml-1 h-5 min-w-5 flex items-center justify-center px-1.5 text-xs">
-                                            {summaries.length}
-                                        </Badge>
-                                    )}
-                                </TabsTrigger>
-                            </TabsList>
+                 <div className="lg:col-span-1">
+                        <div className="sticky top-6">
+                            <Tabs defaultValue="notes" className="w-full">
+                                <TabsList className="grid w-full grid-cols-2 mb-4 bg-white border border-slate-200 shadow-sm p-1.5 h-auto rounded-xl">
+                                    <TabsTrigger
+                                        value="notes"
+                                        className="flex items-center justify-center gap-2 py-2.5 px-4 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg transition-all text-sm font-semibold"
+                                    >
+                                        <BookOpen className="h-4 w-4" />
+                                        <span>Notes</span>
+                                        {notes && notes.length > 0 && (
+                                            <Badge
+                                                variant="secondary"
+                                                className="ml-1 h-5 min-w-5 flex items-center justify-center px-1.5 text-xs data-[state=active]:bg-white data-[state=active]:text-slate-900"
+                                            >
+                                                {notes.length}
+                                            </Badge>
+                                        )}
+                                    </TabsTrigger>
+                                    <TabsTrigger
+                                        value="summaries"
+                                        className="flex items-center justify-center gap-2 py-2.5 px-4 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg transition-all text-sm font-semibold"
+                                    >
+                                        <Calendar className="h-4 w-4" />
+                                        <span>Summaries</span>
+                                        {summaries && summaries.length > 0 && (
+                                            <Badge
+                                                variant="secondary"
+                                                className="ml-1 h-5 min-w-5 flex items-center justify-center px-1.5 text-xs"
+                                            >
+                                                {summaries.length}
+                                            </Badge>
+                                        )}
+                                    </TabsTrigger>
+                                </TabsList>
 
-                            <TabsContent value="notes" className="mt-0 space-y-4">
-                                <NotesSection
-                                    initialNotes={notes}
-                                    companionId={id}
-                                    path={`/companions/${id}`}
-                                />
-                            </TabsContent>
+                                <TabsContent value="notes" className="mt-0">
+                                    <NotesSection
+                                        initialNotes={notes}
+                                        companionId={id}
+                                        path={`/companions/${id}`}
+                                    />
+                                </TabsContent>
 
-                            <TabsContent value="summaries" className="mt-0 space-y-4">
-                                <SummariesSection
-                                    initialSummaries={summaries}
-                                    companionId={id}
-                                    path={`/companions/${id}`}
-                                />
-                            </TabsContent>
-                        </Tabs>
+                                <TabsContent value="summaries" className="mt-0">
+                                    <SummariesSection
+                                        initialSummaries={summaries}
+                                        companionId={id}
+                                        path={`/companions/${id}`}
+                                    />
+                                </TabsContent>
+                            </Tabs>
+                        </div>
                     </div>
-                </div>
             </div>
         </main>
     );
