@@ -8,7 +8,7 @@ interface LiveTranscriptProps {
 
 export const LiveTranscript = ({ messages, userName, assistantName }: LiveTranscriptProps) => {
     return (
-        <section className="relative flex flex-col gap-4 w-full items-center pt-10 flex-grow overflow-hidden">
+        <section className="relative flex flex-col gap-4 w-full items-center pt-10 flex-grow overflow-y-auto">
             <h3 className="font-bold text-xl text-gray-900">Live Transcript</h3>
             <div className="overflow-y-auto w-full flex flex-col gap-4 max-sm:gap-2 pr-2 h-full text-xl no-scrollbar">
                 {messages.length === 0 ? (
