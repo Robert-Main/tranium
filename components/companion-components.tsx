@@ -61,14 +61,18 @@ const CompanionComponents = ({
             if (!raw) return;
             const saved = JSON.parse(raw);
             if (Array.isArray(saved?.messages) && saved.messages.length > 0) {
-                const resume = window.confirm("Resume your previous session transcript?");
-                if (resume) {
-                    setMessages(saved.messages as SavedMessage[]);
-                    // Mark as active so controls reflect ongoing context; user can reconnect when ready
-                    setCallStatus(CallStatus.ACTIVE);
-                } else {
-                    localStorage.removeItem(storageKey);
-                }
+                // Offer a non-blocking resume option for better UX
+                toast.info("Previous session found", {
+                    description: "Resume your previous session transcript?",
+                    action: {
+                        label: "Resume",
+                        onClick: () => {
+                            setMessages(saved.messages as SavedMessage[]);
+                            // Mark as active so controls reflect ongoing context; user can reconnect when ready
+                            setCallStatus(CallStatus.ACTIVE);
+                        },
+                    },
+                });
             }
         } catch (e) {
             console.warn("Failed to load previous session:", e);
