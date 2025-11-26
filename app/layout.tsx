@@ -28,7 +28,6 @@ export default function RootLayout({
                     <Toaster />
                     <NetworkErrorToast />
                     <Navbar />
-
                     {children}
                 </ClerkProvider>
             </body>

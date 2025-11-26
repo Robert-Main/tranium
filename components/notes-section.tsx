@@ -173,7 +173,6 @@ export default function NotesSection({ companionId, sessionId, path, initialNote
 
     return (
         <div className="space-y-4">
-            {/* Add Note Form */}
             <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
@@ -217,7 +216,6 @@ export default function NotesSection({ companionId, sessionId, path, initialNote
                 </Form>
             </div>
 
-            {/* Multi-select Controls */}
             {canMultiSelect && (
                 <div className="flex items-center justify-between gap-2 px-1">
                     <div className="flex items-center gap-2">
@@ -267,7 +265,6 @@ export default function NotesSection({ companionId, sessionId, path, initialNote
                 </div>
             )}
 
-            {/* Notes List */}
             <div className="space-y-3">
                 {initialNotes?.length === 0 ? (
                     <div className="text-center py-16 px-4 bg-slate-50 border border-dashed border-slate-300 rounded-2xl">

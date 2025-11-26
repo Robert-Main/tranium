@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { deleteSummary, updateSummary } from "@/lib/actions/summaries.action";
 import { Button } from "@/components/ui/button";
-import { Trash2, Loader2, CheckSquare, Square, Pencil, FileText, Calendar } from "lucide-react";
+import { Trash2, Loader2, Pencil, FileText, Calendar } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import ConfirmModal from "@/components/confirm-modal";
@@ -25,7 +25,6 @@ interface SummariesSectionProps {
 }
 
 export default function SummariesSection({ companionId, path, initialSummaries }: SummariesSectionProps) {
-    const [isPending] = useTransition();
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [multiSelect, setMultiSelect] = useState(false);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -41,7 +40,6 @@ export default function SummariesSection({ companionId, path, initialSummaries }
         }
     }, [canMultiSelect, multiSelect]);
 
-    // Edit modal state
     const [editOpen, setEditOpen] = useState(false);
     const [editing, setEditing] = useState(false);
     const [editId, setEditId] = useState<string | null>(null);
@@ -102,7 +100,6 @@ export default function SummariesSection({ companionId, path, initialSummaries }
 
     return (
         <div className="w-full space-y-4">
-            {/* Header with Multi-select */}
             {canMultiSelect && (
                 <div className="flex items-center justify-between px-1">
                     <div className="flex items-center gap-2">
@@ -154,7 +151,6 @@ export default function SummariesSection({ companionId, path, initialSummaries }
                 </div>
             )}
 
-            {/* Summaries List */}
             {initialSummaries?.length === 0 ? (
                 <div className="text-center py-16 px-4 bg-slate-50 border border-dashed border-slate-300 rounded-2xl">
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white border border-slate-200 mb-4 shadow-sm">
@@ -191,7 +187,6 @@ export default function SummariesSection({ companionId, path, initialSummaries }
                                     )}
 
                                     <div className="flex-1 min-w-0">
-                                        {/* Date */}
                                         <div className="flex items-center gap-2 mb-2">
                                             <Calendar className="h-3.5 w-3.5 text-slate-400" />
                                             <p className="text-xs text-slate-500 font-medium">
@@ -205,14 +200,12 @@ export default function SummariesSection({ companionId, path, initialSummaries }
                                             </p>
                                         </div>
 
-                                        {/* Title */}
                                         {s.title && (
                                             <h4 className="font-semibold text-slate-900 mb-3 text-sm">
                                                 {s.title}
                                             </h4>
                                         )}
 
-                                        {/* Points */}
                                         <ul className="space-y-1.5">
                                             {s.points.map((p, idx) => (
                                                 <li
@@ -226,7 +219,6 @@ export default function SummariesSection({ companionId, path, initialSummaries }
                                         </ul>
                                     </div>
 
-                                    {/* Action Buttons */}
                                     {!multiSelect && (
                                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                             <Button
@@ -271,7 +263,6 @@ export default function SummariesSection({ companionId, path, initialSummaries }
                 </div>
             )}
 
-            {/* Edit Dialog */}
             <Dialog open={editOpen} onOpenChange={(o) => {
                 if (!o) {
                     setEditOpen(false);
