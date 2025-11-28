@@ -10,7 +10,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Airplay, Ellipsis, Trash, Clock, Play } from "lucide-react";
+import { Ellipsis, Trash, Clock, Play } from "lucide-react";
 import { deleteSessionHistory } from "@/lib/actions/companion.action";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -27,8 +27,6 @@ interface CompanionsListProps {
 const CompanionsList = ({ title, companions, className, isSessionHistory = false }: CompanionsListProps) => {
     const router = useRouter();
     const { userId } = useAuth();
-
-
 
     const [isDeleting, setIsDeleting] = React.useState(false);
 
@@ -51,9 +49,7 @@ const CompanionsList = ({ title, companions, className, isSessionHistory = false
 
     return (
         <article className={cn("bg-white rounded-3xl border-2 border-gray-200 p-6 shadow-sm", className)}>
-            {title && (
-                <h2 className="font-bold text-2xl mb-6 text-gray-900">{title}</h2>
-            )}
+            {title && <h2 className="font-bold text-2xl mb-6 text-gray-900">{title}</h2>}
 
             <div className="space-y-3">
                 {companions?.map((companion, index) => {
@@ -89,13 +85,14 @@ const CompanionsList = ({ title, companions, className, isSessionHistory = false
                                                 {companion.subject}
                                             </span>
                                         </div>
-                                        <p className="text-sm text-gray-600 line-clamp-1">
-                                            {companion.topic}
-                                        </p>
+                                        <p className="text-sm text-gray-600 line-clamp-1">{companion.topic}</p>
                                     </div>
                                 </Link>
                             ) : (
-                                <div className="flex items-center gap-4 flex-1 min-w-0 max-md:w-full opacity-70 cursor-not-allowed" title="Only the creator can start this lesson">
+                                <div
+                                    className="flex items-center gap-4 flex-1 min-w-0 max-md:w-full opacity-70 cursor-not-allowed"
+                                    title="Only the creator can start this lesson"
+                                >
                                     <div
                                         className="size-16 flex items-center justify-center rounded-xl flex-shrink-0"
                                         style={{ backgroundColor: getSubjectColor(companion.subject) }}
@@ -109,16 +106,12 @@ const CompanionsList = ({ title, companions, className, isSessionHistory = false
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                            <h3 className="font-bold text-lg text-gray-900">
-                                                {companion.name}
-                                            </h3>
+                                            <h3 className="font-bold text-lg text-gray-900">{companion.name}</h3>
                                             <span className="bg-black text-white rounded-full text-xs px-2.5 py-1 font-medium capitalize">
                                                 {companion.subject}
                                             </span>
                                         </div>
-                                        <p className="text-sm text-gray-600 line-clamp-1">
-                                            {companion.topic}
-                                        </p>
+                                        <p className="text-sm text-gray-600 line-clamp-1">{companion.topic}</p>
                                     </div>
                                 </div>
                             )}
@@ -147,14 +140,17 @@ const CompanionsList = ({ title, companions, className, isSessionHistory = false
                                                 </Link>
                                             </DropdownMenuItem>
                                         ) : (
-                                            <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="opacity-60 cursor-not-allowed">
+                                            <DropdownMenuItem
+                                                onSelect={(e) => e.preventDefault()}
+                                                className="opacity-60 cursor-not-allowed"
+                                            >
                                                 <Play className="w-4 h-4 text-gray-400" />
                                                 <span className="font-medium">Start Lesson (owner only)</span>
                                             </DropdownMenuItem>
                                         )}
 
-                                        {isSessionHistory && (
-                                            canStart ? (
+                                        {isSessionHistory &&
+                                            (canStart ? (
                                                 <ConfirmModal
                                                     trigger={
                                                         <DropdownMenuItem
@@ -171,12 +167,14 @@ const CompanionsList = ({ title, companions, className, isSessionHistory = false
                                                     onConfirm={() => handleDelete(companion.sessionId)}
                                                 />
                                             ) : (
-                                                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="opacity-60 cursor-not-allowed">
+                                                <DropdownMenuItem
+                                                    onSelect={(e) => e.preventDefault()}
+                                                    className="opacity-60 cursor-not-allowed"
+                                                >
                                                     <Trash className="w-4 h-4 text-gray-400" />
                                                     <span className="font-medium">Delete Session (owner only)</span>
                                                 </DropdownMenuItem>
-                                            )
-                                        )}
+                                            ))}
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>

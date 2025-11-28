@@ -3,7 +3,6 @@
 import { formUrlQuery, removeKeysFromUrlQuery } from "@jsmastery/utils";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import path from "path";
 import React, { useEffect, useState } from "react";
 
 const SearchIput = () => {

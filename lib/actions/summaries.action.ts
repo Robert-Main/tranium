@@ -39,13 +39,7 @@ export async function listSummariesByCompanion(companionId: string) {
     return normalized;
 }
 
-export async function addSummary({
-    companionId,
-    points,
-    path,
-    sessionId,
-    title,
-}: {
+export async function addSummary({companionId,points,path,sessionId,title,}: {
     companionId: string;
     points: string[];
     path: string;
@@ -89,12 +83,7 @@ export async function addSummary({
     return { success: true } as const;
 }
 
-export async function updateSummary({
-    summaryId,
-    title,
-    points,
-    path,
-}: {
+export async function updateSummary({summaryId,title,points,path,}: {
     summaryId: string;
     title?: string | null;
     points: string[];
