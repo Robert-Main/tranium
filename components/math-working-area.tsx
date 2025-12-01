@@ -2,10 +2,9 @@ import { extractSteps, formatMathContent } from "@/constants/formated-math-conte
 import { cn } from "@/lib/utils";
 
 export const MathWorkingArea = ({ messages, assistantName }: { messages: SavedMessage[], assistantName: string }) => {
-    // Get only assistant messages that might contain math
     const assistantMessages = messages
         .filter(msg => msg.role === "assistant")
-        .slice(-3); // Show last 3 messages
+        .slice(-3);
 
     if (assistantMessages.length === 0) {
         return (

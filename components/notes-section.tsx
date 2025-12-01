@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition, useEffect } from "react";
-import { listNotesByCompanion, addNote, deleteNote, updateNote, deleteNotesBulk } from "@/lib/actions/notes.action";
+import {  addNote, deleteNote, updateNote, deleteNotesBulk } from "@/lib/actions/notes.action";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Trash2, Plus, Loader2, Pencil, X, Check, StickyNote } from "lucide-react";
@@ -12,15 +12,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import ConfirmModal from "@/components/confirm-modal";
+import { noteFormSchema, NoteFormValues } from "@/lib/companion-form";
 
-const noteFormSchema = z.object({
-    content: z
-        .string()
-        .min(3, "Note must be at least 3 characters long")
-        .max(1000, "Note must be less than 1000 characters"),
-});
-
-type NoteFormValues = z.infer<typeof noteFormSchema>;
 
 interface Note {
     id: string;
@@ -173,7 +166,6 @@ export default function NotesSection({ companionId, sessionId, path, initialNote
 
     return (
         <div className="space-y-4">
-            {/* Add Note Form */}
             <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
@@ -217,7 +209,6 @@ export default function NotesSection({ companionId, sessionId, path, initialNote
                 </Form>
             </div>
 
-            {/* Multi-select Controls */}
             {canMultiSelect && (
                 <div className="flex items-center justify-between gap-2 px-1">
                     <div className="flex items-center gap-2">
@@ -267,7 +258,6 @@ export default function NotesSection({ companionId, sessionId, path, initialNote
                 </div>
             )}
 
-            {/* Notes List */}
             <div className="space-y-3">
                 {initialNotes?.length === 0 ? (
                     <div className="text-center py-16 px-4 bg-slate-50 border border-dashed border-slate-300 rounded-2xl">

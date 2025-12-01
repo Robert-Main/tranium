@@ -9,3 +9,13 @@ export const companionFormSchema = z.object({
     duration: z.number().min(1, { message: "Duration must be at least 1 minute." }), // Change this
 });
 export type CompanionFormType = z.infer<typeof companionFormSchema>;
+
+
+export const noteFormSchema = z.object({
+    content: z
+        .string()
+        .min(3, "Note must be at least 3 characters long")
+        .max(1000, "Note must be less than 1000 characters"),
+});
+
+export type NoteFormValues = z.infer<typeof noteFormSchema>;

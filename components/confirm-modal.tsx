@@ -13,8 +13,8 @@ import {
 import { Button } from "@/components/ui/button";
 
 interface ConfirmModalProps {
-    trigger?: React.ReactNode; // Optional: allow children as trigger for backward compatibility
-    children?: React.ReactNode; // If provided, used as trigger content
+    trigger?: React.ReactNode;
+    children?: React.ReactNode;
     title?: string;
     description?: string;
     confirmText?: string;
@@ -47,28 +47,18 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
     const triggerNode = trigger ?? children;
 
     return (
-        <Dialog open={open} onOpenChange={setOpen} >
+        <Dialog open={open} onOpenChange={setOpen}>
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
-            <DialogContent className="bg-amber-50">
+            <DialogContent className="bg-gray-50">
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
                     {description && <DialogDescription>{description}</DialogDescription>}
                 </DialogHeader>
                 <DialogFooter>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setOpen(false)}
-                        disabled={loading}
-                    >
+                    <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={loading}>
                         {cancelText}
                     </Button>
-                    <Button
-                        type="button"
-                        variant="destructive"
-                        onClick={handleConfirm}
-                        disabled={loading}
-                    >
+                    <Button type="button" variant="destructive" onClick={handleConfirm} disabled={loading}>
                         {loading ? "Deleting..." : confirmText}
                     </Button>
                 </DialogFooter>

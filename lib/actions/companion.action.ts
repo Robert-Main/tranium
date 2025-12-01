@@ -61,7 +61,6 @@ export const getAllCompanions = async ({ limit = 10, page = 1, subject, topic }:
         query = query.or(`topic.ilike.%${topic}%,name.ilike.%${topic}%`);
     }
 
-    // Apply pagination
     query = query.range((page - 1) * limit, page * limit - 1);
 
     const { data: companions, error } = await query;
@@ -90,7 +89,6 @@ export const getAllCompanions = async ({ limit = 10, page = 1, subject, topic }:
             companion.bookmarked = bookmarkedIds.has(companion.id);
         });
     } else {
-        // If no user is authenticated, set all companions as not bookmarked
         companions?.forEach((companion) => {
             companion.bookmarked = false;
         });
@@ -320,7 +318,6 @@ export const addUserBookmarks = async (companionId: string, path: string) => {
         };
     }
 
-    // Check if bookmark already exists
     const { data: existing } = await supabase
         .from("bookmarks")
         .select("id")

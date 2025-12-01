@@ -35,8 +35,8 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
     const summaries = await listSummariesByCompanion(id);
 
     return (
-        <main className="max-w-[1600px] mx-auto px-4 py-6 h-dvh overflow-y-hidden">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <main className="max-w-[1600px] mx-auto px-4 py-6 h-dvh overflow-y-auto">
+            <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
                     <article className="relative overflow-hidden rounded-3xl border border-gray-200/60 bg-gradient-to-br from-white via-gray-50/30 to-white shadow-xl backdrop-blur-sm">
                         <div
@@ -117,60 +117,60 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
                     />
                 </div>
 
-                 <div className="lg:col-span-1">
-                        <div className="sticky top-6">
-                            <Tabs defaultValue="notes" className="w-full">
-                                <TabsList className="grid w-full grid-cols-2 mb-4 bg-white border border-slate-200 shadow-sm p-1.5 h-auto rounded-xl">
-                                    <TabsTrigger
-                                        value="notes"
-                                        className="flex items-center justify-center gap-2 py-2.5 px-4 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg transition-all text-sm font-semibold"
-                                    >
-                                        <BookOpen className="h-4 w-4" />
-                                        <span>Notes</span>
-                                        {notes && notes.length > 0 && (
-                                            <Badge
-                                                variant="secondary"
-                                                className="ml-1 h-5 min-w-5 flex items-center justify-center px-1.5 text-xs data-[state=active]:bg-white data-[state=active]:text-slate-900"
-                                            >
-                                                {notes.length}
-                                            </Badge>
-                                        )}
-                                    </TabsTrigger>
-                                    <TabsTrigger
-                                        value="summaries"
-                                        className="flex items-center justify-center gap-2 py-2.5 px-4 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg transition-all text-sm font-semibold"
-                                    >
-                                        <Calendar className="h-4 w-4" />
-                                        <span>Summaries</span>
-                                        {summaries && summaries.length > 0 && (
-                                            <Badge
-                                                variant="secondary"
-                                                className="ml-1 h-5 min-w-5 flex items-center justify-center px-1.5 text-xs"
-                                            >
-                                                {summaries.length}
-                                            </Badge>
-                                        )}
-                                    </TabsTrigger>
-                                </TabsList>
+                <div className="lg:col-span-1 w-full">
+                    <div className="lg:sticky lg:top-6">
+                        <Tabs defaultValue="notes" className="w-full">
+                            <TabsList className="grid w-full grid-cols-2 mb-4 bg-white border border-slate-200 shadow-sm p-1.5 h-auto rounded-xl">
+                                <TabsTrigger
+                                    value="notes"
+                                    className="flex items-center justify-center gap-2 py-2.5 px-2 sm:px-4 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg transition-all text-sm font-semibold"
+                                >
+                                    <BookOpen className="h-4 w-4" />
+                                    <span>Notes</span>
+                                    {notes && notes.length > 0 && (
+                                        <Badge
+                                            variant="secondary"
+                                            className="ml-1 h-5 min-w-5 flex items-center justify-center px-1.5 text-xs"
+                                        >
+                                            {notes.length}
+                                        </Badge>
+                                    )}
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="summaries"
+                                    className="flex items-center justify-center gap-2 py-2.5 px-2 sm:px-4 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg transition-all text-sm font-semibold"
+                                >
+                                    <Calendar className="h-4 w-4" />
+                                    <span>Summaries</span>
+                                    {summaries && summaries.length > 0 && (
+                                        <Badge
+                                            variant="secondary"
+                                            className="ml-1 h-5 min-w-5 flex items-center justify-center px-1.5 text-xs"
+                                        >
+                                            {summaries.length}
+                                        </Badge>
+                                    )}
+                                </TabsTrigger>
+                            </TabsList>
 
-                                <TabsContent value="notes" className="mt-0">
-                                    <NotesSection
-                                        initialNotes={notes}
-                                        companionId={id}
-                                        path={`/companions/${id}`}
-                                    />
-                                </TabsContent>
+                            <TabsContent value="notes" className="mt-0">
+                                <NotesSection
+                                    initialNotes={notes}
+                                    companionId={id}
+                                    path={`/companions/${id}`}
+                                />
+                            </TabsContent>
 
-                                <TabsContent value="summaries" className="mt-0">
-                                    <SummariesSection
-                                        initialSummaries={summaries}
-                                        companionId={id}
-                                        path={`/companions/${id}`}
-                                    />
-                                </TabsContent>
-                            </Tabs>
-                        </div>
+                            <TabsContent value="summaries" className="mt-0">
+                                <SummariesSection
+                                    initialSummaries={summaries}
+                                    companionId={id}
+                                    path={`/companions/${id}`}
+                                />
+                            </TabsContent>
+                        </Tabs>
                     </div>
+                </div>
             </div>
         </main>
     );

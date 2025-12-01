@@ -3,8 +3,7 @@
 import { useEffect } from "react";
 import { toast } from "sonner";
 
-// Headless listener component that shows a toast when network goes offline/online
-// Mount this once globally (e.g., in app/layout.tsx)
+
 const NetworkErrorToast = () => {
   useEffect(() => {
     const handleOffline = () => {

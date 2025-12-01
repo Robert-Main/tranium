@@ -48,12 +48,10 @@ const CompanionComponents = ({
     const LottieRef = React.useRef<LottieRefCurrentProps>(null);
     const isMathSubject = subject.toLowerCase() === "maths" || subject.toLowerCase() === "math";
 
-    // Session persistence key per companion
     const storageKey = React.useMemo(() => `companion_session_${companionId}`,[companionId]);
     const savedPointsKey = React.useMemo(() => `companion_saved_points_${companionId}`,[companionId]);
     const savedSummariesKey = React.useMemo(() => `companion_saved_summaries_${companionId}`,[companionId]);
 
-    // Load previous session on mount
     useEffect(() => {
         try {
             if (typeof window === "undefined") return;
@@ -61,22 +59,23 @@ const CompanionComponents = ({
             if (!raw) return;
             const saved = JSON.parse(raw);
             if (Array.isArray(saved?.messages) && saved.messages.length > 0) {
-                const resume = window.confirm("Resume your previous session transcript?");
-                if (resume) {
-                    setMessages(saved.messages as SavedMessage[]);
-                    // Mark as active so controls reflect ongoing context; user can reconnect when ready
-                    setCallStatus(CallStatus.ACTIVE);
-                } else {
-                    localStorage.removeItem(storageKey);
-                }
+                // Offer a non-blocking resume option for better UX
+                toast.info("Previous session found", {
+                    description: "Resume your previous session transcript?",
+                    action: {
+                        label: "Resume",
+                        onClick: () => {
+                            setMessages(saved.messages as SavedMessage[]);
+                            setCallStatus(CallStatus.ACTIVE);
+                        },
+                    },
+                });
             }
         } catch (e) {
             console.warn("Failed to load previous session:", e);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [storageKey]);
 
-    // Load persisted saved key points across sessions (used to avoid duplicate auto-saves)
     useEffect(() => {
         try {
             if (typeof window === "undefined") return;
@@ -93,10 +92,8 @@ const CompanionComponents = ({
         } catch (e) {
             console.warn("Failed to load saved key points:", e);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [savedPointsKey]);
 
-    // Load persisted saved summaries across sessions (avoid duplicate summary saves)
     useEffect(() => {
         try {
             if (typeof window === "undefined") return;
@@ -113,21 +110,17 @@ const CompanionComponents = ({
         } catch (e) {
             console.warn("Failed to load saved summaries:", e);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [savedSummariesKey]);
 
-    // Persist messages as they evolve
     useEffect(() => {
         try {
             if (typeof window === "undefined") return;
             const payload = JSON.stringify({ messages });
             localStorage.setItem(storageKey, payload);
         } catch (e) {
-            // ignore
         }
     }, [messages, storageKey]);
 
-    // Clear saved session when finished
     useEffect(() => {
         if (typeof window === "undefined") return;
         if (callStatus === CallStatus.FINISHED) {
@@ -135,7 +128,6 @@ const CompanionComponents = ({
         }
     }, [callStatus, storageKey]);
 
-    // Lottie animation control
     useEffect(() => {
         if (LottieRef) {
             if (isSpeaking) {
@@ -146,7 +138,6 @@ const CompanionComponents = ({
         }
     }, [isSpeaking]);
 
-    // VAPI events hook
     useVapiEvents({
         callStatus,
         companionId,
@@ -230,7 +221,6 @@ const CompanionComponents = ({
         }
     };
 
-    // Build a compact recap from previous messages so the assistant can continue
     const buildRecap = () => {
         try {
             if (!messages || messages.length === 0) return "";
@@ -325,7 +315,6 @@ const CompanionComponents = ({
             if (Array.isArray(data.summaries) && data.summaries.length > 0) {
                 setSummaryPoints(data.summaries);
 
-                // Build a stable normalized signature for this summary to avoid duplicate saves
                 const normalizedPoints = data.summaries.map((p: string) => normalizePoint(p)).sort();
                 const signature = normalizePoint(`${topic || ''}`) + '|' + normalizedPoints.join('||');
 
@@ -342,7 +331,6 @@ const CompanionComponents = ({
                         path: pathname || `/companions/${companionId}`,
                     });
                     if (result?.success) {
-                        // Persist signature to avoid future duplicates
                         savedSummariesRef.current.add(signature);
                         try {
                             if (typeof window !== 'undefined') {
