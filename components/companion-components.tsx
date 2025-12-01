@@ -48,9 +48,9 @@ const CompanionComponents = ({
     const LottieRef = React.useRef<LottieRefCurrentProps>(null);
     const isMathSubject = subject.toLowerCase() === "maths" || subject.toLowerCase() === "math";
 
-    const storageKey = React.useMemo(() => `companion_session_${companionId}`,[companionId]);
-    const savedPointsKey = React.useMemo(() => `companion_saved_points_${companionId}`,[companionId]);
-    const savedSummariesKey = React.useMemo(() => `companion_saved_summaries_${companionId}`,[companionId]);
+    const storageKey = React.useMemo(() => `companion_session_${companionId}`, [companionId]);
+    const savedPointsKey = React.useMemo(() => `companion_saved_points_${companionId}`, [companionId]);
+    const savedSummariesKey = React.useMemo(() => `companion_saved_summaries_${companionId}`, [companionId]);
 
     useEffect(() => {
         try {
@@ -117,14 +117,15 @@ const CompanionComponents = ({
             if (typeof window === "undefined") return;
             const payload = JSON.stringify({ messages });
             localStorage.setItem(storageKey, payload);
-        } catch (e) {
-        }
+        } catch (e) {}
     }, [messages, storageKey]);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
         if (callStatus === CallStatus.FINISHED) {
-            try { localStorage.removeItem(storageKey); } catch (_) {}
+            try {
+                localStorage.removeItem(storageKey);
+            } catch (_) {}
         }
     }, [callStatus, storageKey]);
 
@@ -143,6 +144,8 @@ const CompanionComponents = ({
         companionId,
         autoSaveKeyPoints,
         pathname,
+        topic, // ADD THIS
+        subject, // ADD THIS
         setCallStatus,
         setIsSpeaking,
         setIsMuted,
@@ -160,7 +163,7 @@ const CompanionComponents = ({
                 const merged = Array.from(new Set([...(existingArr || []), ...normalized]));
                 localStorage.setItem(savedPointsKey, JSON.stringify(merged));
             } catch (_) {}
-        }
+        },
     });
 
     const handleToggleMic = async () => {
@@ -227,7 +230,9 @@ const CompanionComponents = ({
             const last = messages.slice(-10);
             const lines = last.map((m) => {
                 const role = m.role === "assistant" ? name : userName || "You";
-                const content = String(m.content || "").trim().slice(0, 220);
+                const content = String(m.content || "")
+                    .trim()
+                    .slice(0, 220);
                 return `${role}: ${content}`;
             });
             const recap = lines.join("\n");
@@ -316,7 +321,7 @@ const CompanionComponents = ({
                 setSummaryPoints(data.summaries);
 
                 const normalizedPoints = data.summaries.map((p: string) => normalizePoint(p)).sort();
-                const signature = normalizePoint(`${topic || ''}`) + '|' + normalizedPoints.join('||');
+                const signature = normalizePoint(`${topic || ""}`) + "|" + normalizedPoints.join("||");
 
                 if (savedSummariesRef.current.has(signature)) {
                     toast.message("Summary generated", { description: "Already saved earlier. Not saving again." });
@@ -333,7 +338,7 @@ const CompanionComponents = ({
                     if (result?.success) {
                         savedSummariesRef.current.add(signature);
                         try {
-                            if (typeof window !== 'undefined') {
+                            if (typeof window !== "undefined") {
                                 const existingRaw = localStorage.getItem(savedSummariesKey);
                                 const existingArr: string[] = existingRaw ? JSON.parse(existingRaw) : [];
                                 const merged = Array.from(new Set([...(existingArr || []), signature]));
@@ -392,11 +397,7 @@ const CompanionComponents = ({
                 </section>
 
                 {!isMathSubject && (
-                    <LiveTranscript
-                        messages={messages}
-                        userName={userName}
-                        assistantName={name.split(" ")[0]}
-                    />
+                    <LiveTranscript messages={messages} userName={userName} assistantName={name.split(" ")[0]} />
                 )}
             </section>
 
@@ -423,4 +424,4 @@ const CompanionComponents = ({
     );
 };
 
-export default CompanionComponents
+export default CompanionComponents;

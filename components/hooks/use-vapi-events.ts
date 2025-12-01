@@ -12,6 +12,8 @@ interface UseVapiEventsProps {
     companionId: string;
     autoSaveKeyPoints: boolean;
     pathname: string;
+    topic: string;
+    subject: string;
     setCallStatus: (status: CallStatusValue) => void;
     setIsSpeaking: (speaking: boolean) => void;
     setIsMuted: (muted: boolean) => void;
@@ -29,6 +31,8 @@ export const useVapiEvents = ({
     companionId,
     autoSaveKeyPoints,
     pathname,
+    topic,
+    subject,
     setCallStatus,
     setIsSpeaking,
     setIsMuted,
@@ -78,10 +82,10 @@ export const useVapiEvents = ({
                         const transcript = String(message.transcript || "").trim();
                         if (transcript.length < 50) return;
 
-                        const points = extractKeyPoints(transcript);
+                        // Pass topic and subject to extractKeyPoints
+                        const points = extractKeyPoints(transcript, topic, subject);
 
                         if (points.length > 0) {
-
                             const uniqueNew = points.filter((p) => {
                                 const norm = normalizePoint(p);
                                 return !savedKeyPointsRef.current.has(norm);
@@ -181,6 +185,8 @@ export const useVapiEvents = ({
         companionId,
         autoSaveKeyPoints,
         pathname,
+        topic,
+        subject,
         setCallStatus,
         setIsSpeaking,
         setIsMuted,
@@ -190,5 +196,6 @@ export const useVapiEvents = ({
         isPausedByUserRef,
         savedKeyPointsRef,
         onRefresh,
+        onKeyPointsSaved,
     ]);
 };
