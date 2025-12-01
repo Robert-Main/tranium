@@ -2,7 +2,7 @@
 
 import { configureAssistant, normalizePoint } from "@/lib/utils";
 import { vapi } from "@/lib/vapi.sdk";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { LottieRefCurrentProps } from "lottie-react";
 import { toast } from "sonner";
 import { usePathname, useRouter } from "next/navigation";
@@ -59,7 +59,6 @@ const CompanionComponents = ({
             if (!raw) return;
             const saved = JSON.parse(raw);
             if (Array.isArray(saved?.messages) && saved.messages.length > 0) {
-                // Offer a non-blocking resume option for better UX
                 toast.info("Previous session found", {
                     description: "Resume your previous session transcript?",
                     action: {
@@ -139,23 +138,9 @@ const CompanionComponents = ({
         }
     }, [isSpeaking]);
 
-    useVapiEvents({
-        callStatus,
-        companionId,
-        autoSaveKeyPoints,
-        pathname,
-        topic, // ADD THIS
-        subject, // ADD THIS
-        setCallStatus,
-        setIsSpeaking,
-        setIsMuted,
-        setMessages,
-        setIsPauseDialogOpen,
-        terminationHandledRef,
-        isPausedByUserRef,
-        savedKeyPointsRef,
-        onRefresh: () => router.refresh(),
-        onKeyPointsSaved: (normalized) => {
+    // Stabilize the onKeyPointsSaved callback
+    const handleKeyPointsSaved = useCallback(
+        (normalized: string[]) => {
             try {
                 if (typeof window === "undefined") return;
                 const existingRaw = localStorage.getItem(savedPointsKey);
@@ -164,6 +149,31 @@ const CompanionComponents = ({
                 localStorage.setItem(savedPointsKey, JSON.stringify(merged));
             } catch (_) {}
         },
+        [savedPointsKey]
+    );
+
+    // Stabilize the onRefresh callback
+    const handleRefresh = useCallback(() => {
+        router.refresh();
+    }, [router]);
+
+    useVapiEvents({
+        callStatus,
+        companionId,
+        autoSaveKeyPoints,
+        pathname,
+        topic,
+        subject,
+        setCallStatus,
+        setIsSpeaking,
+        setIsMuted,
+        setMessages,
+        setIsPauseDialogOpen,
+        terminationHandledRef,
+        isPausedByUserRef,
+        savedKeyPointsRef,
+        onRefresh: handleRefresh,
+        onKeyPointsSaved: handleKeyPointsSaved,
     });
 
     const handleToggleMic = async () => {
@@ -325,7 +335,7 @@ const CompanionComponents = ({
 
                 if (savedSummariesRef.current.has(signature)) {
                     toast.message("Summary generated", { description: "Already saved earlier. Not saving again." });
-                    return; // do not attempt to save duplicate
+                    return;
                 }
 
                 try {

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { vapi } from "@/lib/vapi.sdk";
 import { addSessionHistory } from "@/lib/actions/companion.action";
 import { addNote } from "@/lib/actions/notes.action";
@@ -7,24 +7,7 @@ import { extractKeyPoints, normalizePoint } from "@/lib/utils";
 import { CallStatus } from "@/lib/call-status";
 import type { CallStatusValue } from "@/lib/call-status";
 
-interface UseVapiEventsProps {
-    callStatus: CallStatusValue;
-    companionId: string;
-    autoSaveKeyPoints: boolean;
-    pathname: string;
-    topic: string;
-    subject: string;
-    setCallStatus: (status: CallStatusValue) => void;
-    setIsSpeaking: (speaking: boolean) => void;
-    setIsMuted: (muted: boolean) => void;
-    setMessages: React.Dispatch<React.SetStateAction<SavedMessage[]>>;
-    setIsPauseDialogOpen: (open: boolean) => void;
-    terminationHandledRef: React.MutableRefObject<boolean>;
-    isPausedByUserRef: React.MutableRefObject<boolean>;
-    savedKeyPointsRef: React.MutableRefObject<Set<string>>;
-    onRefresh: () => void;
-    onKeyPointsSaved?: (normalizedPoints: string[]) => void;
-}
+
 
 export const useVapiEvents = ({
     callStatus,
@@ -44,6 +27,15 @@ export const useVapiEvents = ({
     onRefresh,
     onKeyPointsSaved,
 }: UseVapiEventsProps) => {
+    // Stabilize the topic and subject using refs to avoid dependency issues
+    const topicRef = React.useRef(topic);
+    const subjectRef = React.useRef(subject);
+
+    React.useEffect(() => {
+        topicRef.current = topic;
+        subjectRef.current = subject;
+    }, [topic, subject]);
+
     useEffect(() => {
         const onCallStatus = () => setCallStatus(CallStatus.ACTIVE);
 
@@ -82,8 +74,8 @@ export const useVapiEvents = ({
                         const transcript = String(message.transcript || "").trim();
                         if (transcript.length < 50) return;
 
-                        // Pass topic and subject to extractKeyPoints
-                        const points = extractKeyPoints(transcript, topic, subject);
+                        // Use refs to get current topic and subject
+                        const points = extractKeyPoints(transcript, topicRef.current, subjectRef.current);
 
                         if (points.length > 0) {
                             const uniqueNew = points.filter((p) => {
@@ -185,8 +177,6 @@ export const useVapiEvents = ({
         companionId,
         autoSaveKeyPoints,
         pathname,
-        topic,
-        subject,
         setCallStatus,
         setIsSpeaking,
         setIsMuted,
