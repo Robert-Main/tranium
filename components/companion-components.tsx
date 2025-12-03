@@ -2,7 +2,7 @@
 
 import { configureAssistant, normalizePoint } from "@/lib/utils";
 import { vapi } from "@/lib/vapi.sdk";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { LottieRefCurrentProps } from "lottie-react";
 import { toast } from "sonner";
 import { usePathname, useRouter } from "next/navigation";
@@ -48,9 +48,9 @@ const CompanionComponents = ({
     const LottieRef = React.useRef<LottieRefCurrentProps>(null);
     const isMathSubject = subject.toLowerCase() === "maths" || subject.toLowerCase() === "math";
 
-    const storageKey = React.useMemo(() => `companion_session_${companionId}`,[companionId]);
-    const savedPointsKey = React.useMemo(() => `companion_saved_points_${companionId}`,[companionId]);
-    const savedSummariesKey = React.useMemo(() => `companion_saved_summaries_${companionId}`,[companionId]);
+    const storageKey = React.useMemo(() => `companion_session_${companionId}`, [companionId]);
+    const savedPointsKey = React.useMemo(() => `companion_saved_points_${companionId}`, [companionId]);
+    const savedSummariesKey = React.useMemo(() => `companion_saved_summaries_${companionId}`, [companionId]);
 
     useEffect(() => {
         try {
@@ -59,7 +59,6 @@ const CompanionComponents = ({
             if (!raw) return;
             const saved = JSON.parse(raw);
             if (Array.isArray(saved?.messages) && saved.messages.length > 0) {
-                // Offer a non-blocking resume option for better UX
                 toast.info("Previous session found", {
                     description: "Resume your previous session transcript?",
                     action: {
@@ -117,14 +116,15 @@ const CompanionComponents = ({
             if (typeof window === "undefined") return;
             const payload = JSON.stringify({ messages });
             localStorage.setItem(storageKey, payload);
-        } catch (e) {
-        }
+        } catch (e) {}
     }, [messages, storageKey]);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
         if (callStatus === CallStatus.FINISHED) {
-            try { localStorage.removeItem(storageKey); } catch (_) {}
+            try {
+                localStorage.removeItem(storageKey);
+            } catch (_) {}
         }
     }, [callStatus, storageKey]);
 
@@ -138,11 +138,32 @@ const CompanionComponents = ({
         }
     }, [isSpeaking]);
 
+    // Stabilize the onKeyPointsSaved callback
+    const handleKeyPointsSaved = useCallback(
+        (normalized: string[]) => {
+            try {
+                if (typeof window === "undefined") return;
+                const existingRaw = localStorage.getItem(savedPointsKey);
+                const existingArr: string[] = existingRaw ? JSON.parse(existingRaw) : [];
+                const merged = Array.from(new Set([...(existingArr || []), ...normalized]));
+                localStorage.setItem(savedPointsKey, JSON.stringify(merged));
+            } catch (_) {}
+        },
+        [savedPointsKey]
+    );
+
+    // Stabilize the onRefresh callback
+    const handleRefresh = useCallback(() => {
+        router.refresh();
+    }, [router]);
+
     useVapiEvents({
         callStatus,
         companionId,
         autoSaveKeyPoints,
         pathname,
+        topic,
+        subject,
         setCallStatus,
         setIsSpeaking,
         setIsMuted,
@@ -151,16 +172,8 @@ const CompanionComponents = ({
         terminationHandledRef,
         isPausedByUserRef,
         savedKeyPointsRef,
-        onRefresh: () => router.refresh(),
-        onKeyPointsSaved: (normalized) => {
-            try {
-                if (typeof window === "undefined") return;
-                const existingRaw = localStorage.getItem(savedPointsKey);
-                const existingArr: string[] = existingRaw ? JSON.parse(existingRaw) : [];
-                const merged = Array.from(new Set([...(existingArr || []), ...normalized]));
-                localStorage.setItem(savedPointsKey, JSON.stringify(merged));
-            } catch (_) {}
-        }
+        onRefresh: handleRefresh,
+        onKeyPointsSaved: handleKeyPointsSaved,
     });
 
     const handleToggleMic = async () => {
@@ -227,7 +240,9 @@ const CompanionComponents = ({
             const last = messages.slice(-10);
             const lines = last.map((m) => {
                 const role = m.role === "assistant" ? name : userName || "You";
-                const content = String(m.content || "").trim().slice(0, 220);
+                const content = String(m.content || "")
+                    .trim()
+                    .slice(0, 220);
                 return `${role}: ${content}`;
             });
             const recap = lines.join("\n");
@@ -316,11 +331,11 @@ const CompanionComponents = ({
                 setSummaryPoints(data.summaries);
 
                 const normalizedPoints = data.summaries.map((p: string) => normalizePoint(p)).sort();
-                const signature = normalizePoint(`${topic || ''}`) + '|' + normalizedPoints.join('||');
+                const signature = normalizePoint(`${topic || ""}`) + "|" + normalizedPoints.join("||");
 
                 if (savedSummariesRef.current.has(signature)) {
                     toast.message("Summary generated", { description: "Already saved earlier. Not saving again." });
-                    return; // do not attempt to save duplicate
+                    return;
                 }
 
                 try {
@@ -333,7 +348,7 @@ const CompanionComponents = ({
                     if (result?.success) {
                         savedSummariesRef.current.add(signature);
                         try {
-                            if (typeof window !== 'undefined') {
+                            if (typeof window !== "undefined") {
                                 const existingRaw = localStorage.getItem(savedSummariesKey);
                                 const existingArr: string[] = existingRaw ? JSON.parse(existingRaw) : [];
                                 const merged = Array.from(new Set([...(existingArr || []), signature]));
@@ -392,11 +407,7 @@ const CompanionComponents = ({
                 </section>
 
                 {!isMathSubject && (
-                    <LiveTranscript
-                        messages={messages}
-                        userName={userName}
-                        assistantName={name.split(" ")[0]}
-                    />
+                    <LiveTranscript messages={messages} userName={userName} assistantName={name.split(" ")[0]} />
                 )}
             </section>
 
@@ -423,4 +434,4 @@ const CompanionComponents = ({
     );
 };
 
-export default CompanionComponents
+export default CompanionComponents;

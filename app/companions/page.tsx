@@ -5,6 +5,8 @@ import { getSubjectColor } from "@/lib/utils";
 import SearchIput from "@/components/search-input";
 import SubjectFilters from "@/components/subject-filters";
 import { unstable_noStore as noStore } from "next/cache";
+import Link from "next/link";
+import { Plus } from "lucide-react";
 
 const CompanionsLibrary = async ({ searchParams }: SearchParams) => {
     noStore(); // Prevent caching
@@ -17,15 +19,27 @@ const CompanionsLibrary = async ({ searchParams }: SearchParams) => {
     const companions = result?.success ? result.data : [];
 
     return (
-        <main className="">
-            <section className="flex items-center justify-between flex-row gap-4 max-sm:flex-col ">
-                <h1 className="flex-1">Companion Library</h1>
-                <div className="flex gap-4 flex-row max-sm:flex-col w-full flex-1/3">
-                    <SearchIput />
+        <main className="p-6 max-w-7xl mx-auto">
+            <section className="mb-3">
+                 <div className="flex items-center justify-between mb-6 gap-4">
+                    <h1 className="text-xl sm:text-3xl font-bold">Companion Library</h1>
+                    <Link
+                        href="/companions/new"
+                        className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg transition-colors whitespace-nowrap font-medium shadow-sm text-sm sm:text-base"
+                    >
+                        <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <span className="hidden xs:inline">Add Companion</span>
+                        <span className="xs:hidden">Add</span>
+                    </Link>
+                </div>
+                <div className="flex gap-4 md:justify-between flex-col sm:flex-row sm:items-center">
+                    <div className="flex-1 max-w-md">
+                        <SearchIput />
+                    </div>
                     <SubjectFilters />
                 </div>
             </section>
-            <section className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 w-full gap-3">
+            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {companions && companions.length > 0 ? (
                     companions.map((companion: any) => (
                         <CompanionCard
@@ -41,7 +55,13 @@ const CompanionsLibrary = async ({ searchParams }: SearchParams) => {
                         />
                     ))
                 ) : (
-                    <p>No companions found.</p>
+                    <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
+                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                            <Plus className="w-10 h-10 text-gray-400" />
+                        </div>
+                        <p className="text-gray-600 text-lg mb-2">No companions found</p>
+                        <p className="text-gray-400 text-sm">Try adjusting your filters or create a new companion</p>
+                    </div>
                 )}
             </section>
         </main>
