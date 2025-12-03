@@ -5,7 +5,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import React from "react";
-import { Clock, BookOpen, StickyNote, FileText, Calendar } from "lucide-react";
+import { Clock, BookOpen, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NotesSection from "@/components/notes-section";
