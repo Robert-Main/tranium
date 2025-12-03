@@ -137,3 +137,23 @@ interface CompanionProps {
     userImage: string;
     voice: string;
 }
+
+
+interface UseVapiEventsProps {
+    callStatus: CallStatusValue;
+    companionId: string;
+    autoSaveKeyPoints: boolean;
+    pathname: string;
+    topic: string;
+    subject: string;
+    setCallStatus: (status: CallStatusValue) => void;
+    setIsSpeaking: (speaking: boolean) => void;
+    setIsMuted: (muted: boolean) => void;
+    setMessages: React.Dispatch<React.SetStateAction<SavedMessage[]>>;
+    setIsPauseDialogOpen: (open: boolean) => void;
+    terminationHandledRef: React.MutableRefObject<boolean>;
+    isPausedByUserRef: React.MutableRefObject<boolean>;
+    savedKeyPointsRef: React.MutableRefObject<Set<string>>;
+    onRefresh: () => void;
+    onKeyPointsSaved?: (normalizedPoints: string[]) => void;
+}
