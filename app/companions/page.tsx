@@ -19,10 +19,10 @@ const CompanionsLibrary = async ({ searchParams }: SearchParams) => {
     const companions = result?.success ? result.data : [];
 
     return (
-        <main className="p-6 max-w-7xl mx-auto">
-            <section className="mb-3">
+        <main className="p-4 max-w-8xl mx-auto">
+            <section >
                  <div className="flex items-center justify-between mb-6 gap-4">
-                    <h1 className="text-xl sm:text-3xl font-bold">Companion Library</h1>
+                    <h1 className="text-xl sm:text-3xl font-bold">Companions Library</h1>
                     <Link
                         href="/companions/new"
                         className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg transition-colors whitespace-nowrap font-medium shadow-sm text-sm sm:text-base"

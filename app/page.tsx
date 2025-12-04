@@ -24,9 +24,9 @@ const Page = async () => {
 
     return (
         <main >
-            <h1 className="text-xl py-0">Popular Companions</h1>
-            <section className="home-section">
-                {companions?.data?.slice(0, 3).map((companion: Companion) => (
+            <h1 className="text-xl ">Popular Companions</h1>
+            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ">
+                {companions?.data?.slice(0, 4).map((companion: Companion) => (
                     <CompanionCard {...companion} key={companion.id} color={getSubjectColor(companion.subject)} />
                 ))}
             </section>

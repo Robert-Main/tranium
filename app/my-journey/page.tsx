@@ -25,14 +25,14 @@ const Profile = async () => {
 
     return (
         <main className="flex flex-col mx-auto px-4 py-4">
-            <section className="flex justify-between gap-6 max-lg:flex-col items-start lg:items-center ">
-                <div className="hidden sm:flex gap-6 items-center">
+            <section className="flex justify-between gap-3 max-lg:flex-co items-start lg:items-center ">
+                <div className="hidden sm:flex gap-4 items-center">
                     <Image
                         src={user.imageUrl}
                         alt="user-image"
                         width={100}
                         height={100}
-                        className="rounded-2xl border-4 border-white sm:w-[80px] sm:h-[80px] shadow-lg"
+                        className="rounded-2xl border-4 border-white sm:w-20 sm:h-20 shadow-lg"
                     />
                     <div className="flex flex-col gap-2">
                         <h1 className="text-3xl font-bold">
@@ -43,7 +43,7 @@ const Profile = async () => {
                 </div>
 
                 <div className="flex gap-4 max-sm:flex-col max-sm:w-full">
-                    <div className="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-200 rounded-xl p-5 flex flex-col gap-3 min-w-[160px]">
+                    <div className="bg-linear-to-br from-green-50 to-green-100 border-2 border-green-200 rounded-xl p-3 flex md:flex-col items-center flex-row gap-3 min-w-40">
                         <div className="flex gap-3 items-center">
                             <div className="bg-green-500 rounded-full p-2">
                                 <Image src="/icons/check.svg" alt="checkmark" width={20} height={20} />
@@ -53,7 +53,7 @@ const Profile = async () => {
                         <p className="text-sm font-medium text-green-700">Lessons Completed</p>
                     </div>
 
-                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 rounded-xl p-5 flex flex-col gap-3 min-w-[160px]">
+                    <div className="bg-linear-to-br from-blue-50 to-blue-100 border-2 border-blue-200 rounded-xl p-3 flex  md:flex-col items-center flex-row gap-3 min-w-40">
                         <div className="flex gap-3 items-center">
                             <div className="bg-blue-500 rounded-full p-2">
                                 <Image src="/icons/cap.svg" alt="cap" width={20} height={20} />
@@ -78,7 +78,7 @@ const Profile = async () => {
                     </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="companions" className="mt-6">
+                <TabsContent value="companions" className="mt-2">
                     {companions && companions.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {companions.map((companion) => (

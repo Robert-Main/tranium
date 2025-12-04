@@ -105,7 +105,7 @@ const CompanionCard = ({
     return (
         <article className="group relative flex flex-col rounded-3xl border-2 border-gray-200 bg-white overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:border-gray-300">
             <div
-                className="relative h-32 flex items-center justify-center overflow-hidden"
+                className="relative h-30 flex items-center justify-center overflow-hidden"
                 style={{ backgroundColor: color }}
             >
                 <div className="relative z-10">
@@ -118,7 +118,7 @@ const CompanionCard = ({
                     />
                 </div>
 
-                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-linear-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                 <div className="absolute top-3 right-3 flex gap-2">
                     <button
@@ -146,14 +146,14 @@ const CompanionCard = ({
                 </div>
             </div>
 
-            <div className="flex flex-col flex-grow p-5 gap-4">
+            <div className="flex flex-col grow p-5 gap-4">
                 <Link href={`/companions/${id}`}>
                     <h2 className="text-xl font-bold text-gray-900 line-clamp-2 hover:text-primary transition-colors duration-200">
                         {name}
                     </h2>
                 </Link>
 
-                <p className="text-sm text-gray-600 line-clamp-2 flex-grow min-h-[2.5rem]">{topic}</p>
+                <p className="text-sm text-gray-600 line-clamp-2 grow">{topic}</p>
 
                 <div className="flex items-center gap-2 text-gray-500">
                     <Clock className="w-4 h-4" />
@@ -165,19 +165,19 @@ const CompanionCard = ({
                 <div className="flex gap-2 items-center">
                     {isOwner ? (
                         <Link href={`/companions/${id}`} className="flex-1">
-                            <button className="cursor-pointer group w-full bg-primary hover:bg-primary/90 text-white rounded-xl font-semibold transition-all duration-200 shadow-md hover:shadow-lg px-4 py-2.5 flex items-center justify-center gap-2">
+                            <button className="cursor-pointer text-sm group w-full bg-primary hover:bg-primary/90 text-white rounded-xl font-semibold transition-all duration-200 shadow-md hover:shadow-lg px-4 py-2.5 flex items-center justify-center gap-2">
                                 <Play className="w-4 h-4 transition-transform group-hover:scale-110 cursor-pointer" />
-                                Launch Lesson
+                                Launch session
                             </button>
                         </Link>
                     ) : (
                         <button
-                            className="w-full bg-gray-200 text-gray-500 rounded-xl font-semibold px-4 py-2.5 flex items-center justify-center gap-2 cursor-not-allowed opacity-70 flex-1"
+                            className="w-full text-sm bg-gray-200 text-gray-500 rounded-xl font-semibold px-4 py-2.5 flex items-center justify-center gap-2 cursor-not-allowed opacity-70 flex-1"
                             title="Only the creator can start this lesson"
                             disabled
                         >
                             <Play className="w-4 h-4" />
-                            Launch Lesson
+                            Launch session
                         </button>
                     )}
 

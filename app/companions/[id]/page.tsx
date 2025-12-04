@@ -35,10 +35,10 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
     const summaries = await listSummariesByCompanion(id);
 
     return (
-        <main className="max-w-[1600px] mx-auto px-4 py-6 h-dvh overflow-y-auto">
-            <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6">
+        <main className="max-w-[1600px] mx-auto px-4 py-4 h-dvh overflow-y-auto">
+            <div className="flex flex-col lg:grid lg:grid-cols-3 ">
                 <div className="lg:col-span-2 space-y-6">
-                    <article className="relative overflow-hidden rounded-3xl border border-gray-200/60 bg-gradient-to-br from-white via-gray-50/30 to-white shadow-xl backdrop-blur-sm">
+                    <article className="relative overflow-hidden rounded-3xl border border-gray-200/60 bg-linear-to-br from-white via-gray-50/30 to-white shadow-xl backdrop-blur-sm">
                         <div
                             className="absolute top-0 right-0 w-96 h-96 rounded-full blur-[100px] opacity-10"
                             style={{ backgroundColor: getSubjectColor(subject) }}
@@ -74,7 +74,7 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
                                                     className="capitalize text-sm font-semibold px-4 py-1.5 shadow-sm"
                                                     style={{
                                                         backgroundColor: getSubjectColor(subject),
-                                                        color: 'black'
+                                                        color: "black",
                                                     }}
                                                 >
                                                     {subject}
@@ -92,17 +92,13 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
                                     </div>
 
                                     <div className="flex items-start gap-3 p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-gray-200/50">
-                                        <BookOpen className="h-5 w-5 text-gray-600 mt-0.5 flex-shrink-0" />
-                                        <p className="text-base text-gray-700 leading-relaxed">
-                                            {topic}
-                                        </p>
+                                        <BookOpen className="h-5 w-5 text-gray-600 mt-0.5 shrink-0" />
+                                        <p className="text-base text-gray-700 leading-relaxed">{topic}</p>
                                     </div>
 
                                     <div className="flex md:hidden items-center gap-2 text-gray-600 px-4 py-2 bg-white/60 backdrop-blur-sm rounded-xl border border-gray-200/50 w-fit">
                                         <Clock className="h-5 w-5" />
-                                        <span className="text-sm font-medium">
-                                            {duration} minutes
-                                        </span>
+                                        <span className="text-sm font-medium">{duration} minutes</span>
                                     </div>
                                 </div>
                             </div>
@@ -118,19 +114,19 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
                 </div>
 
                 <div className="lg:col-span-1 w-full">
-                    <div className="lg:sticky lg:top-6">
+                    <div className="lg:sticky lg:top-6 relative z-10">
                         <Tabs defaultValue="notes" className="w-full">
-                            <TabsList className="grid w-full grid-cols-2 mb-4 bg-white border border-slate-200 shadow-sm p-1.5 h-auto rounded-xl">
+                            <TabsList className="grid w-full grid-cols-2 mb-4 bg-white border border-slate-200 shadow-sm p-1.5 h-auto rounded-xl touch-manipulation">
                                 <TabsTrigger
                                     value="notes"
-                                    className="flex items-center justify-center gap-2 py-2.5 px-2 sm:px-4 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg transition-all text-sm font-semibold"
+                                    className="flex items-center justify-center gap-2 py-2.5 px-2 sm:px-4 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg transition-all text-sm font-semibold cursor-pointer touch-manipulation"
                                 >
-                                    <BookOpen className="h-4 w-4" />
-                                    <span>Notes</span>
+                                    <BookOpen className="h-4 w-4 pointer-events-none" />
+                                    <span className="pointer-events-none">Notes</span>
                                     {notes && notes.length > 0 && (
                                         <Badge
                                             variant="secondary"
-                                            className="ml-1 h-5 min-w-5 flex items-center justify-center px-1.5 text-xs"
+                                            className="ml-1 h-5 min-w-5 flex items-center justify-center px-1.5 text-xs pointer-events-none"
                                         >
                                             {notes.length}
                                         </Badge>
@@ -138,14 +134,14 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="summaries"
-                                    className="flex items-center justify-center gap-2 py-2.5 px-2 sm:px-4 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg transition-all text-sm font-semibold"
+                                    className="flex items-center justify-center gap-2 py-2.5 px-2 sm:px-4 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg transition-all text-sm font-semibold cursor-pointer touch-manipulation"
                                 >
-                                    <Calendar className="h-4 w-4" />
-                                    <span>Summaries</span>
+                                    <Calendar className="h-4 w-4 pointer-events-none" />
+                                    <span className="pointer-events-none">Summaries</span>
                                     {summaries && summaries.length > 0 && (
                                         <Badge
                                             variant="secondary"
-                                            className="ml-1 h-5 min-w-5 flex items-center justify-center px-1.5 text-xs"
+                                            className="ml-1 h-5 min-w-5 flex items-center justify-center px-1.5 text-xs pointer-events-none"
                                         >
                                             {summaries.length}
                                         </Badge>
@@ -154,11 +150,7 @@ const CompanionSession = async ({ params }: CompanionSessionProps) => {
                             </TabsList>
 
                             <TabsContent value="notes" className="mt-0">
-                                <NotesSection
-                                    initialNotes={notes}
-                                    companionId={id}
-                                    path={`/companions/${id}`}
-                                />
+                                <NotesSection initialNotes={notes} companionId={id} path={`/companions/${id}`} />
                             </TabsContent>
 
                             <TabsContent value="summaries" className="mt-0">
